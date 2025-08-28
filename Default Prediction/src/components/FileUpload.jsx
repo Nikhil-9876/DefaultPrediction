@@ -4,6 +4,9 @@ function FileUpload({ onProcess, isLoading }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragActive, setIsDragActive] = useState(false);
 
+  // const token=localStorage.getItem("token");
+  // console.log(token);
+
   // Supported file extensions
   const SUPPORTED_FORMATS = ['.csv', '.xlsx', '.xls', '.xlsm', '.xlsb', '.ods', '.json'];
   

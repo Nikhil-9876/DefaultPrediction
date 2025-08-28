@@ -1,50 +1,92 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import ResultsDisplay from '../../components/ResultsDisplay';
 
 function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
-  // Escape key handler and background scroll prevention
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  const handleBackdropClick = useCallback((e) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }, [handleClose]);
+
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        e.preventDefault();
+        handleClose();
       }
     };
-    
+
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden'; // Prevent background scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
     }
     
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
+
+  const getAnalysisData = () => {
+    if (!analysisData) return null;
+    return analysisData?.jsonData;
+  };
+
+  const dataToDisplay = getAnalysisData();
 
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-      onClick={onClose} // Click outside to close
+      onClick={handleBackdropClick}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+        className="bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden flex flex-col relative"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Body - Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
-          {analysisData?.data ? (
+        {/* Rest of your component remains the same */}
+        <div className="flex items-center justify-between p-6 pr-16 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">
+            Analysis Results {analysisData?.fileName && `- ${analysisData.fileName}`}
+          </h2>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          {dataToDisplay ? (
             <ResultsDisplay 
-              data={analysisData.data}
-              filename={analysisData.filename}
+              data={dataToDisplay}
+              filename={analysisData?.fileName || 'Analysis Results'}
               showNotification={showNotification}
             />
           ) : (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <i className="fas fa-exclamation-triangle text-4xl text-gray-400 mb-4"></i>
-                <p className="text-gray-500">No analysis data available</p>
+                <svg 
+                  className="mx-auto h-12 w-12 text-gray-400 mb-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" 
+                  />
+                </svg>
+                <p className="text-gray-500 mb-2">No analysis data available</p>
+                <p className="text-sm text-gray-400">
+                  {analysisData ? 'Data structure may be different than expected' : 'No data provided'}
+                </p>
               </div>
             </div>
           )}

@@ -5,6 +5,9 @@ function Dashboard({ history, onLoadAnalysis }) {
   const totalAnalyses = history.length;
   const lastAnalysis = history[0];
 
+  const usertype=localStorage.getItem("userType");
+  // console.log("User type on Dashboard:", usertype);
+
   const getPortfolioStats = (analysis) => {
     if (!analysis || !analysis.data || !analysis.data.portfolio_overview) return null;
     return analysis.data.portfolio_overview.approval_summary;

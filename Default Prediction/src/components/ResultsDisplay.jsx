@@ -8,6 +8,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
 
+
   const handleExportExcel = () => {
     // Prepare data for Excel export
     const excelData = data.individual_applicants.map((applicant) => ({

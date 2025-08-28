@@ -5,19 +5,43 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
 
-  const handleRowClick = (analysis) => {
+  console.log("Rendering AnalysisHistory with history:", history);
+
+  const handleRowClick = (analysis, event) => {
+    console.log("Selected analysis for modal:", analysis);
+    
+    // Prevent any potential event conflicts
+    if (event) {
+      event.stopPropagation();
+    }
+    
     setSelectedAnalysis(analysis);
-    setModalOpen(true);
-    // Still call the original onLoadAnalysis if needed
+    
+    // Use setTimeout to ensure state is set before opening modal
+    setTimeout(() => {
+      setModalOpen(true);
+    }, 0);
+    
     if (onLoadAnalysis) {
       onLoadAnalysis(analysis);
     }
   };
 
   const handleCloseModal = () => {
+    console.log("Closing modal");
     setModalOpen(false);
-    setSelectedAnalysis(null);
+    // Small delay before clearing selected analysis to prevent conflicts
+    setTimeout(() => {
+      setSelectedAnalysis(null);
+    }, 100);
   };
+
+  // Debug the history data structure
+  console.log("History received:", history);
+  if (history && history.length > 0) {
+    console.log("First history item:", history[0]);
+    console.log("First history item keys:", Object.keys(history[0]));
+  }
 
   return (
     <>
@@ -25,11 +49,11 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">Analysis History</h1>
           <div className="text-sm text-gray-500">
-            {history.length} analyses stored
+            {Array.isArray(history) ? history.length : 0} analyses stored
           </div>
         </div>
 
-        {history.length === 0 ? (
+        {!Array.isArray(history) || history.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-12 text-center">
             <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <i className="fas fa-history text-3xl text-gray-400"></i>
@@ -49,39 +73,63 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
               <div className="col-span-1">Actions</div>
             </div>
             <div className="divide-y divide-gray-200">
-              {history.map((analysis) => {
-                // Safe access to nested properties with fallbacks
-                const stats = analysis.data?.portfolio_overview?.approval_summary || {
-                  Approve: 0,
-                  Review: 0,
-                  Reject: 0
-                };
+              {history.map((analysis, index) => {
+                
+                let stats = null;
+                let filename = 'Unknown File';
+                let timestamp = null;
+                let status = 'completed';
+                let id = analysis.id || `analysis-${index}`;
+                stats = analysis?.jsonData?.portfolio_overview?.approval_summary;
+
+                // Set default stats if none found
+                if (!stats) {
+                  stats = { Approve: 0, Review: 0, Reject: 0 };
+                  console.log("No stats found, using default:", stats);
+                }
+
+                // Extract other properties with multiple fallbacks
+                filename = analysis.fileName || `File ${index + 1}`;
+                timestamp = analysis.dateTime || 
+                           analysis.timestamp || 
+                           analysis.created_at || 
+                           analysis.date;
+                status = analysis.status || 'completed';
+
                 const total = (stats.Approve || 0) + (stats.Review || 0) + (stats.Reject || 0);
+                
+                console.log(`Analysis ${index} processed:`, {
+                  filename,
+                  timestamp,
+                  status,
+                  stats,
+                  total
+                });
                 
                 return (
                   <div 
-                    key={analysis.id} 
+                    key={id} 
                     className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition cursor-pointer"
-                    onClick={() => handleRowClick(analysis)}
+                    onClick={(e) => handleRowClick(analysis, e)}
                   >
                     <div className="col-span-3 font-medium text-blue-600 truncate">
-                      {analysis.filename || 'Unknown File'}
+                      {filename}
                     </div>
                     <div className="col-span-2 text-sm">
-                      {analysis.timestamp ? new Date(analysis.timestamp).toLocaleDateString() : 'N/A'}
+                      {timestamp ? new Date(timestamp).toLocaleDateString() : 'N/A'}
                       <span className="text-gray-400 block">
-                        {analysis.timestamp ? new Date(analysis.timestamp).toLocaleTimeString() : ''}
+                        {timestamp ? new Date(timestamp).toLocaleTimeString() : ''}
                       </span>
                     </div>
                     <div className="col-span-1">
-                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                        {analysis.status || 'Completed'}
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 capitalize">
+                        {status}
                       </span>
                     </div>
                     <div className="col-span-1 font-medium">{total}</div>
                     <div className="col-span-2">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-2">
+                        <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center mr-2 text-xs">
                           {stats.Approve || 0}
                         </div>
                         <div className="text-sm text-gray-500">
@@ -91,7 +139,7 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
                     </div>
                     <div className="col-span-2">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center mr-2">
+                        <div className="w-8 h-8 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center mr-2 text-xs">
                           {stats.Review || 0}
                         </div>
                         <div className="text-sm text-gray-500">
@@ -104,7 +152,7 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
                         className="text-blue-600 hover:text-blue-800 p-1"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleRowClick(analysis);
+                          handleRowClick(analysis, e);
                         }}
                         title="View Analysis"
                       >
