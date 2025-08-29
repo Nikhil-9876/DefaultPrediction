@@ -3,11 +3,12 @@ import SummaryCards from "./SummaryCards";
 import ApplicantCard from "./ApplicantCard";
 import * as XLSX from 'xlsx';
 
-function ResultsDisplay({ data, filename, showNotification }) {
+function ResultsDisplay({ data, filename,showNotification }) {
   const [expandedApplicant, setExpandedApplicant] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
 
+  console.log("ResultsDisplay received data:", data);
 
   const handleExportExcel = () => {
     // Prepare data for Excel export
@@ -166,12 +167,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-          <i className="fas fa-poll text-blue-500"></i> Analysis Results
-          {filename && (
-            <span className="text-sm font-normal text-gray-500 ml-2">
-              ({filename})
-            </span>
-          )}
+          {filename}
         </h2>
         <div className="flex items-center space-x-4">
           <div className="relative">

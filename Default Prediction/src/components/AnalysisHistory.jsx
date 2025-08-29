@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
 import ResultsModal from './../assets/modal/ResultsModal';
 
-function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
+function AnalysisHistory({ history ,onLoadAnalysis, showNotification }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
 
-  console.log("Rendering AnalysisHistory with history:", history);
-
   const handleRowClick = (analysis, event) => {
     console.log("Selected analysis for modal:", analysis);
-    
-    // Prevent any potential event conflicts
     if (event) {
       event.stopPropagation();
     }
-    
     setSelectedAnalysis(analysis);
-    
-    // Use setTimeout to ensure state is set before opening modal
     setTimeout(() => {
       setModalOpen(true);
     }, 0);
@@ -35,13 +28,6 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
       setSelectedAnalysis(null);
     }, 100);
   };
-
-  // Debug the history data structure
-  console.log("History received:", history);
-  if (history && history.length > 0) {
-    console.log("First history item:", history[0]);
-    console.log("First history item keys:", Object.keys(history[0]));
-  }
 
   return (
     <>
@@ -82,19 +68,15 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification }) {
                 let id = analysis.id || `analysis-${index}`;
                 stats = analysis?.jsonData?.portfolio_overview?.approval_summary;
 
-                // Set default stats if none found
+                // console.log("this is me",analysis.jsonData);
                 if (!stats) {
                   stats = { Approve: 0, Review: 0, Reject: 0 };
-                  console.log("No stats found, using default:", stats);
                 }
 
                 // Extract other properties with multiple fallbacks
                 filename = analysis.fileName || `File ${index + 1}`;
-                timestamp = analysis.dateTime || 
-                           analysis.timestamp || 
-                           analysis.created_at || 
-                           analysis.date;
-                status = analysis.status || 'completed';
+                timestamp = analysis.dateTime 
+                status = 'completed';
 
                 const total = (stats.Approve || 0) + (stats.Review || 0) + (stats.Reject || 0);
                 

@@ -47,7 +47,6 @@ function AppInner() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched analysis history:", data); // Debug log
         setAnalysisHistory(data);
       } else {
         console.error("Failed to fetch analysis history");
@@ -57,7 +56,6 @@ function AppInner() {
     }
   }, []);
 
-  // Fetch analysis history from backend on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -72,14 +70,10 @@ function AppInner() {
     return () => clearTimeout(timer);
   }, [navigate]);
 
-  // Function to save analysis to backend
   const saveAnalysisToBackend = async (analysisData) => {
     try {
       const token = localStorage.getItem("token");
-      
-      // Debug: Log what we're sending
-      console.log("Saving analysis to backend:", analysisData);
-      
+
       const response = await fetch(
         "http://localhost:4000/results/SaveResults",
         {
@@ -94,7 +88,6 @@ function AppInner() {
 
       if (response.ok) {
         const savedAnalysis = await response.json();
-        console.log("Analysis saved successfully:", savedAnalysis);
         return savedAnalysis;
       } else {
         const errorText = await response.text();
@@ -117,72 +110,69 @@ function AppInner() {
       showNotification("Please provide valid data.", "error");
       return;
     }
-    
+
     setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
-      
+
       const response = await fetch(
         "http://127.0.0.1:5000/api/credit_risk/analyze",
         { method: "POST", body: formData }
       );
-      
+
       if (!response.ok) {
         throw new Error(`Analysis failed: ${response.status}`);
       }
-      
-      const data = await response.json();
-      console.log("Analysis API response:", data); // Debug log
 
-      // Validate that we have analysis data
-      if (!data || Object.keys(data).length === 0) {
-        throw new Error("Analysis returned empty data");
+      const data = await response.json();
+
+      if (!data || !data.results || Object.keys(data.results).length === 0) {
+        throw new Error("Analysis returned empty results");
       }
 
-      // Structure the analysis object for saving and display
       const newAnalysis = {
-        id: `ANL-${Date.now()}`,
-        timestamp: new Date().toISOString(),
         filename: file.name,
-        jsonData: data, // This must not be empty for Mongoose validation
-        status: "completed",
-        userType: userType,
+        jsonData: data.results,
       };
 
-      console.log("Structured analysis object:", newAnalysis); // Debug log
-
       try {
-        // Save to backend first
         const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
 
-        // Update history with saved analysis
-        setAnalysisHistory(prevHistory => [savedAnalysis, ...prevHistory]);
-
-        // Set data for modal display - pass the full analysis object
-        setAnalysisData({
+        // Create the analysis entry with timestamp
+        const analysisWithTimestamp = {
+          ...savedAnalysis,
           filename: file.name,
-          fileName: file.name, // Both for compatibility
-          jsonData: data
-        });
-        
+          jsonData: data.results,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Update local analysis history immediately
+        setAnalysisHistory((prevHistory) => [
+          analysisWithTimestamp,
+          ...prevHistory,
+        ]);
+
+        setAnalysisData(newAnalysis);
         setShowModal(true);
-        showNotification("Analysis completed and saved successfully!", "success");
-        
+        showNotification(
+          "Analysis completed and saved successfully!",
+          "success"
+        );
       } catch (saveError) {
         console.error("Save error:", saveError);
-        
-        // If backend save fails, still show the analysis
+
         setAnalysisData({
-          filename: file.name,
           fileName: file.name,
-          jsonData: data
+          jsonData: data.results,
         });
-        
+
         setShowModal(true);
-        showNotification("Analysis completed but failed to save to server.", "warning");
+        showNotification(
+          "Analysis completed but failed to save to server.",
+          "warning"
+        );
       }
-      
     } catch (error) {
       console.error("Processing error:", error);
       showNotification(`Processing failed: ${error.message}`, "error");
@@ -192,15 +182,7 @@ function AppInner() {
   };
 
   const handleLoadFromHistory = (analysis) => {
-    console.log("Loading analysis from history:", analysis); // Debug log
-    
-    // Ensure we have the right data structure
-    setAnalysisData({
-      filename: analysis.filename,
-      fileName: analysis.filename, // Both for compatibility
-      jsonData: analysis.jsonData
-    });
-    
+    setAnalysisData(analysis);
     setShowModal(true);
     showNotification("Analysis loaded from history", "success");
   };
@@ -222,13 +204,14 @@ function AppInner() {
           onClose={() => setNotification(null)}
         />
       )}
-      
-      {/* Results Modal - Pass the full analysisData object */}
-      <ResultsModal 
-        analysisData={analysisData} // Pass full object, not just jsonData
+
+      <ResultsModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        analysisData={analysisData}
         showNotification={showNotification}
       />
-      
+
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

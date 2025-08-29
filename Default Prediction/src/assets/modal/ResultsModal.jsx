@@ -6,6 +6,8 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
     onClose();
   }, [onClose]);
 
+  console.log("ResultsModal received analysisData:", analysisData);
+
   const handleBackdropClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
       onClose()
@@ -37,12 +39,6 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
 
   if (!isOpen) return null;
 
-  const getAnalysisData = () => {
-    if (!analysisData) return null;
-    return analysisData?.jsonData;
-  };
-
-  const dataToDisplay = getAnalysisData();
 
   return (
     <div 
@@ -56,15 +52,15 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
         {/* Rest of your component remains the same */}
         <div className="flex items-center justify-between p-6 pr-16 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">
-            Analysis Results {analysisData?.fileName && `- ${analysisData.fileName}`}
+            Analysis Results
           </h2>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          {dataToDisplay ? (
+          {analysisData ? (
             <ResultsDisplay 
-              data={dataToDisplay}
-              filename={analysisData?.fileName || 'Analysis Results'}
+              data={analysisData.jsonData}
+              filename={analysisData.fileName}
               showNotification={showNotification}
             />
           ) : (
