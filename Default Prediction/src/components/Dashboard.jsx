@@ -4,16 +4,35 @@ import { Link } from 'react-router-dom';
 function Dashboard({ history, onLoadAnalysis }) {
   const totalAnalyses = history.length;
   const lastAnalysis = history[0];
+  console.log("history in dash", lastAnalysis);
 
-  const usertype=localStorage.getItem("userType");
-  // console.log("User type on Dashboard:", usertype);
+  const usertype = localStorage.getItem("userType");
 
-  const getPortfolioStats = (analysis) => {
-    if (!analysis || !analysis.data || !analysis.data.portfolio_overview) return null;
-    return analysis.data.portfolio_overview.approval_summary;
+  // Calculate total portfolio stats from ALL analyses
+  const getTotalPortfolioStats = (analysisHistory) => {
+    let totalApproved = 0;
+    let totalRejected = 0;
+    let totalPending = 0;
+
+    analysisHistory.forEach(analysis => {
+      const portfolioOverview = analysis.jsonData?.portfolio_overview;
+      if (portfolioOverview && portfolioOverview.approval_summary) {
+        const summary = portfolioOverview.approval_summary;
+        totalApproved += summary.Approve || 0;
+        totalRejected += summary.Reject || 0;
+        totalPending += summary.Pending || 0;
+      }
+    });
+
+    return {
+      totalApproved,
+      totalRejected,
+      totalPending,
+      hasData: totalApproved + totalRejected + totalPending > 0
+    };
   };
 
-  const portfolioStats = getPortfolioStats(lastAnalysis);
+  const portfolioStats = getTotalPortfolioStats(history);
 
   return (
     <div className="space-y-6">
@@ -21,13 +40,13 @@ function Dashboard({ history, onLoadAnalysis }) {
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
         <div className="text-sm text-gray-500">
           {lastAnalysis
-            ? `Last analyzed: ${new Date(lastAnalysis.timestamp).toLocaleString()}`
+            ? `Last analyzed: ${new Date(lastAnalysis.dateTime).toLocaleString()}`
             : 'No analyses yet'}
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -40,12 +59,12 @@ function Dashboard({ history, onLoadAnalysis }) {
           </div>
         </div>
 
-        {portfolioStats ? (
+        {portfolioStats.hasData ? (
           <div className="bg-white rounded-xl shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Approved Loans</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{portfolioStats.Approve || 0}</p>
+                <p className="text-sm font-medium text-gray-500">Total Approved Loans</p>
+                <p className="text-3xl font-bold text-green-600 mt-1">{portfolioStats.totalApproved}</p>
               </div>
               <div className="p-3 rounded-lg bg-green-100 text-green-600">
                 <i className="fas fa-check-circle text-xl"></i>
@@ -54,7 +73,21 @@ function Dashboard({ history, onLoadAnalysis }) {
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow p-6 flex items-center justify-center">
-            <p className="text-gray-500">No analysis data available</p>
+            <p className="text-gray-500">No portfolio data available</p>
+          </div>
+        )}
+
+        {portfolioStats.hasData && (
+          <div className="bg-white rounded-xl shadow p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Total Rejected Loans</p>
+                <p className="text-3xl font-bold text-red-600 mt-1">{portfolioStats.totalRejected}</p>
+              </div>
+              <div className="p-3 rounded-lg bg-red-100 text-red-600">
+                <i className="fas fa-times-circle text-xl"></i>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -105,23 +138,23 @@ function Dashboard({ history, onLoadAnalysis }) {
           <div className="divide-y divide-gray-200">
             {history.slice(0, 5).map((analysis) => (
               <div
-                key={analysis.id}
+                key={analysis._id}
                 className="px-6 py-4 hover:bg-gray-50 transition cursor-pointer"
                 onClick={() => onLoadAnalysis(analysis)}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-800">{analysis.filename}</p>
+                    <p className="font-medium text-gray-800">{analysis.fileName}</p>
                     <p className="text-sm text-gray-500">
-                      {new Date(analysis.timestamp).toLocaleString()}
+                      {new Date(analysis.dateTime).toLocaleString()}
                     </p>
                   </div>
                   <div className="flex items-center space-x-4">
                     <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                      {analysis.status || 'Completed'}
+                      'Completed'
                     </span>
                     <span className="text-sm text-gray-500">
-                      {analysis.data?.individual_applicants?.length || 0} applicants
+                      {analysis.jsonData?.individual_applicants?.length || 0} applicants
                     </span>
                   </div>
                 </div>

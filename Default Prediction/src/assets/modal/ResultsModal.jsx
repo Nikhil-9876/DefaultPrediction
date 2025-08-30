@@ -6,7 +6,6 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
     onClose();
   }, [onClose]);
 
-  console.log("ResultsModal received analysisData:", analysisData);
 
   const handleBackdropClick = useCallback((e) => {
     if (e.target === e.currentTarget) {

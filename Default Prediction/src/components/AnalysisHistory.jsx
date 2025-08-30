@@ -56,7 +56,7 @@ function AnalysisHistory({ history ,onLoadAnalysis, showNotification }) {
               <div className="col-span-1">Total</div>
               <div className="col-span-2">Approved</div>
               <div className="col-span-2">Review</div>
-              <div className="col-span-1">Actions</div>
+              <div className="col-span-1">Rejected</div>
             </div>
             <div className="divide-y divide-gray-200">
               {history.map((analysis, index) => {
@@ -129,17 +129,15 @@ function AnalysisHistory({ history ,onLoadAnalysis, showNotification }) {
                         </div>
                       </div>
                     </div>
-                    <div className="col-span-1 flex justify-end">
-                      <button 
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRowClick(analysis, e);
-                        }}
-                        title="View Analysis"
-                      >
-                        <i className="fas fa-eye"></i>
-                      </button>
+                    <div className="col-span-1">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-red-100 text-red-700 flex items-center justify-center mr-2 text-xs">
+                          {stats.Reject || 0}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {total > 0 ? Math.round(((stats.Reject || 0) / total) * 100) : 0}%
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );

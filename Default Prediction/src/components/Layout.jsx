@@ -34,7 +34,10 @@ function Layout({ children }) {
     localStorage.removeItem("token");
     localStorage.removeItem("userType");
     localStorage.removeItem("analysisHistory"); // Clear any cached analysis history
-    
+
+    // Dispatch auth change event to clear state in App component
+    window.dispatchEvent(new Event("auth-change"));
+
     // Force refresh the page to clear all state
     window.location.href = "/login";
   };
@@ -90,14 +93,41 @@ function Layout({ children }) {
               </Link>
             </nav>
 
-            {/* Logout Button - Bottom Left */}
-            <div className="mt-auto pt-4 border-t border-blue-700">
+            {/* User Info & Logout Section - Bottom Left */}
+            <div className="mt-auto pt-4 space-y-3 border-t border-blue-700">
+              {/* User Type Info */}
+              <div className="flex items-center px-4 py-2 bg-blue-700 bg-opacity-50 rounded-lg">
+                <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full mr-3">
+                  <i
+                    className={`fas ${
+                      isBanker ? "fa-user-tie" : "fa-user"
+                    } text-white text-sm`}
+                  ></i>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-blue-200 uppercase tracking-wider">
+                    {isBanker ? "Banker Account" : "User Account"}
+                  </p>
+                  <p className="text-sm font-medium text-white">
+                    {isBanker ? "Banking Portal" : "Credit Analysis"}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      isBanker ? "bg-green-400" : "bg-blue-400"
+                    }`}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg text-blue-200 hover:bg-red-600 hover:text-white transition-colors duration-200"
+                className="flex items-center w-full px-4 py-4 text-sm font-medium rounded-lg text-blue-200 hover:bg-red-600 hover:text-white transition-colors duration-200"
               >
-                <i className="fas fa-sign-out-alt mr-3"></i>
-                Logout
+                <i className="fas fa-sign-out-alt mr-4"></i>
+                <span className="leading-none">Logout</span>
               </button>
             </div>
           </div>
@@ -113,6 +143,17 @@ function Layout({ children }) {
             <span className="text-lg font-semibold">RiskAnalyzer</span>
           </div>
           <div className="flex items-center gap-2">
+            {/* Mobile user type indicator */}
+            <div className="flex items-center px-2 py-1 bg-blue-700 rounded-md">
+              <i
+                className={`fas ${
+                  isBanker ? "fa-user-tie" : "fa-user"
+                } text-xs mr-1`}
+              ></i>
+              <span className="text-xs font-medium">
+                {isBanker ? "Banker" : "User"}
+              </span>
+            </div>
             {/* Mobile logout button */}
             <button
               onClick={handleLogout}

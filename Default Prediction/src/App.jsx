@@ -26,7 +26,8 @@ function AppInner() {
   const [notification, setNotification] = useState(null);
   const [analysisHistory, setAnalysisHistory] = useState([]);
   const [booting, setBooting] = useState(true);
-  const [showModal, setShowModal] = useState(false); // Single modal state
+  const [showModal, setShowModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token")); // Add login state
   const navigate = useNavigate();
 
   const userType = localStorage.getItem("userType");
@@ -35,7 +36,10 @@ function AppInner() {
   const fetchAnalysisHistory = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token) {
+        setAnalysisHistory([]); // Clear history if no token
+        return;
+      }
 
       const response = await fetch("http://localhost:4000/results/GetResults", {
         method: "GET",
@@ -48,17 +52,52 @@ function AppInner() {
       if (response.ok) {
         const data = await response.json();
         setAnalysisHistory(data);
+        console.log("Order of history:", data);
       } else {
         console.error("Failed to fetch analysis history");
+        setAnalysisHistory([]); // Clear history on error
       }
     } catch (error) {
       console.error("Error fetching analysis history:", error);
+      setAnalysisHistory([]); // Clear history on error
     }
   }, []);
 
+  // Listen for auth changes (login/logout)
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const token = localStorage.getItem("token");
+      const loggedIn = !!token;
+      
+      console.log("Auth change detected, logged in:", loggedIn);
+      setIsLoggedIn(loggedIn);
+      
+      if (loggedIn) {
+        // Fetch history immediately after login
+        fetchAnalysisHistory();
+      } else {
+        // Clear history on logout
+        setAnalysisHistory([]);
+      }
+    };
+
+    // Listen for the custom auth-change event from Login component
+    window.addEventListener("auth-change", handleAuthChange);
+    
+    // Also listen for storage changes (in case of logout from another tab)
+    window.addEventListener("storage", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("auth-change", handleAuthChange);
+      window.removeEventListener("storage", handleAuthChange);
+    };
+  }, [fetchAnalysisHistory]);
+
+  // Initial fetch on mount if already logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+      setIsLoggedIn(true);
       fetchAnalysisHistory();
     }
   }, [fetchAnalysisHistory]);
@@ -73,7 +112,7 @@ function AppInner() {
   const saveAnalysisToBackend = async (analysisData) => {
     try {
       const token = localStorage.getItem("token");
-
+      console.log("this one ", analysisData);
       const response = await fetch(
         "http://localhost:4000/results/SaveResults",
         {
@@ -138,20 +177,9 @@ function AppInner() {
 
       try {
         const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
-
-        // Create the analysis entry with timestamp
-        const analysisWithTimestamp = {
-          ...savedAnalysis,
-          filename: file.name,
-          jsonData: data.results,
-          timestamp: new Date().toISOString(),
-        };
-
-        // Update local analysis history immediately
-        setAnalysisHistory((prevHistory) => [
-          analysisWithTimestamp,
-          ...prevHistory,
-        ]);
+        
+        // Refresh the analysis history from backend to get the latest data
+        await fetchAnalysisHistory();
 
         setAnalysisData(newAnalysis);
         setShowModal(true);
