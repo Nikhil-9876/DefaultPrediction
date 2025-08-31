@@ -33,7 +33,6 @@ function AppInner() {
 
   const userType = localStorage.getItem("userType");
 
-  // Function to fetch analysis history from backend
   const fetchAnalysisHistory = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
@@ -63,7 +62,6 @@ function AppInner() {
     }
   }, []);
 
-  // Function to delete analysis from backend
   const handleDeleteAnalysis = async (analysis) => {
     try {
       const token = localStorage.getItem("token");
@@ -81,11 +79,9 @@ function AppInner() {
       );
 
       if (response.ok) {
-        // Remove from local state immediately for better UX
         setAnalysisHistory(prev => 
           prev.filter(item => (item._id || item.id) !== analysisId)
         );
-        
         showNotification("Analysis deleted successfully", "success");
       } else {
         const errorData = await response.json();
@@ -100,13 +96,11 @@ function AppInner() {
     }
   };
 
-  // Listen for auth changes (login/logout)
   useEffect(() => {
     const handleAuthChange = () => {
       const token = localStorage.getItem("token");
       const loggedIn = !!token;
       
-      console.log("Auth change detected, logged in:", loggedIn);
       setIsLoggedIn(loggedIn);
       
       if (loggedIn) {
@@ -125,7 +119,6 @@ function AppInner() {
     };
   }, [fetchAnalysisHistory]);
 
-  // Initial fetch on mount if already logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -144,7 +137,7 @@ function AppInner() {
   const saveAnalysisToBackend = async (analysisData) => {
     try {
       const token = localStorage.getItem("token");
-      console.log("this one ", analysisData);
+      
       const response = await fetch(
         "http://localhost:4000/results/SaveResults",
         {
@@ -193,58 +186,63 @@ function AppInner() {
       );
 
       if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error("Python endpoint error:", errorText);
+        throw new Error(`Analysis failed: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
 
-      if (!data || !data.results || Object.keys(data.results).length === 0) {
-        throw new Error("Analysis returned empty results");
+      if (!data || !data.data || !Array.isArray(data.data) || data.data.length === 0) {
+        console.error("Invalid response structure:", data);
+        throw new Error("Analysis returned empty or invalid results");
       }
 
       const newAnalysis = {
         filename: file.name,
-        jsonData: data.results,
+        jsonData: data.data,
+        timestamp: new Date().toISOString(),
+        recordCount: data.data.length,
+        processedRows: data.processed_rows
       };
 
-      // Save to localStorage for users, backend for bankers
       if (userType === "user") {
-        localStorage.setItem("userAnalysisData", JSON.stringify(data.results));
-        console.log("Analysis data saved to localStorage for user");
+        localStorage.setItem("userAnalysisData", JSON.stringify(data.data));
         
         setAnalysisData(newAnalysis);
         setShowModal(true);
-        showNotification("Analysis completed and saved locally!", "success");
+        showNotification(`Analysis completed! Processed ${data.data.length} records.`, "success");
       } else {
-        // Keep existing banker logic unchanged
         try {
           const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
-          
           await fetchAnalysisHistory();
 
           setAnalysisData(newAnalysis);
           setShowModal(true);
           showNotification(
-            "Analysis completed and saved successfully!",
+            `Analysis completed and saved successfully! Processed ${data.data.length} records.`,
             "success"
           );
         } catch (saveError) {
           console.error("Save error:", saveError);
 
           setAnalysisData({
-            fileName: file.name,
-            jsonData: data.results,
+            filename: file.name,
+            jsonData: data.data,
+            timestamp: new Date().toISOString(),
+            recordCount: data.data.length
           });
 
           setShowModal(true);
           showNotification(
-            "Analysis completed but failed to save to server.",
+            `Analysis completed but failed to save to server. Processed ${data.data.length} records.`,
             "warning"
           );
         }
       }
     } catch (error) {
       console.error("Processing error:", error);
+      console.error("Error stack:", error.stack);
       showNotification(`Processing failed: ${error.message}`, "error");
     } finally {
       setIsLoading(false);
@@ -262,7 +260,9 @@ function AppInner() {
     setAnalysisData(null);
   };
 
-  if (booting) return <LoadingOverlay />;
+  if (booting) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <>
