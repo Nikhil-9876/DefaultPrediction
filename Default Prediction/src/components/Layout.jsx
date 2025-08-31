@@ -91,6 +91,18 @@ function Layout({ children }) {
                 <i className="fas fa-history mr-3"></i>
                 Analysis History
               </Link>
+              
+              <Link
+                to="/about"
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                  location.pathname === "/about"
+                    ? "bg-blue-700 text-white"
+                    : "text-blue-200 hover:bg-blue-700 hover:text-white"
+                }`}
+              >
+                <i className="fas fa-info-circle mr-3"></i>
+                About Us
+              </Link>
             </nav>
 
             {/* User Info & Logout Section - Bottom Left */}

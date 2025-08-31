@@ -16,6 +16,7 @@ import AnalysisHistory from "./components/AnalysisHistory";
 import Signup from "./components/Authentication/Signup/Signup";
 import Login from "./components/Authentication/Login/Login";
 import LoadingOverlay from "./components/LoadingOverlay";
+import About from "./components/About";
 import "./App.css";
 import ProtectedRoutes from "./routes/protectedRoutes";
 import ResultsModal from "./assets/modal/ResultsModal";
@@ -333,6 +334,15 @@ function AppInner() {
                   onDeleteAnalysis={handleDeleteAnalysis}
                   userType={userType}
                 />
+              </Layout>
+            }
+          />
+          
+          <Route
+            path="/about"
+            element={
+              <Layout userType={userType}>
+                <About />
               </Layout>
             }
           />
