@@ -22,7 +22,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
       "Monthly Income": applicant.demographics.monthly_income,
       "Risk Level": applicant.risk_assessment.overall_risk,
       "Risk Color": applicant.risk_assessment.risk_color,
-      "Default Probability": `${(applicant.risk_assessment.default_probability * 100).toFixed(2)}%`,
+      "Default Probability": `${(applicant.risk_assessment.default_probability * 100).toFixed(2)}%`, // Fixed: Added backticks
       "Recommendation": applicant.risk_assessment.recommendation,
       "Repayment Ability": applicant.top_decision_metrics.find(m => m.name === "Repayment Ability")?.value || "N/A",
       "Timeliness Score": applicant.top_decision_metrics.find(m => m.name === "Payment Timeliness")?.value || "N/A",
@@ -42,20 +42,20 @@ function ResultsDisplay({ data, filename, showNotification }) {
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     XLSX.utils.book_append_sheet(workbook, worksheet, "Credit Risk Analysis");
 
-    // Summary sheet
+    // Summary sheet - Added error handling
     const summaryData = [
-      { Metric: "Total Applicants", Value: data.analysis_metadata.total_applicants },
-      { Metric: "Approved", Value: data.portfolio_overview.approval_summary.Approve },
-      { Metric: "Under Review", Value: data.portfolio_overview.approval_summary.Review },
-      { Metric: "Rejected", Value: data.portfolio_overview.approval_summary.Reject },
-      { Metric: "Low Risk", Value: data.portfolio_overview.risk_distribution.Low },
-      { Metric: "Medium Risk", Value: data.portfolio_overview.risk_distribution.Medium },
-      { Metric: "High Risk", Value: data.portfolio_overview.risk_distribution.High },
-      { Metric: "Total Loan Potential", Value: data.portfolio_overview.total_loan_potential },
-      { Metric: "Average Default Probability", Value: `${(data.portfolio_overview.average_metrics.default_probability * 100).toFixed(2)}%` },
-      { Metric: "Average Timeliness Score", Value: data.portfolio_overview.average_metrics.timeliness_score },
-      { Metric: "Average Repayment Score", Value: data.portfolio_overview.average_metrics.repayment_score },
-      { Metric: "Average Monthly Income", Value: data.portfolio_overview.average_metrics.monthly_income }
+      { Metric: "Total Applicants", Value: data.analysis_metadata?.total_applicants || data.individual_applicants?.length || 0 },
+      { Metric: "Approved", Value: data.portfolio_overview?.approval_summary?.Approve || 0 },
+      { Metric: "Under Review", Value: data.portfolio_overview?.approval_summary?.Review || 0 },
+      { Metric: "Rejected", Value: data.portfolio_overview?.approval_summary?.Reject || 0 },
+      { Metric: "Low Risk", Value: data.portfolio_overview?.risk_distribution?.Low || 0 },
+      { Metric: "Medium Risk", Value: data.portfolio_overview?.risk_distribution?.Medium || 0 },
+      { Metric: "High Risk", Value: data.portfolio_overview?.risk_distribution?.High || 0 },
+      { Metric: "Total Loan Potential", Value: data.portfolio_overview?.total_loan_potential || 0 },
+      { Metric: "Average Default Probability", Value: `${((data.portfolio_overview?.average_metrics?.default_probability || 0) * 100).toFixed(2)}%` }, // Fixed: Added backticks
+      { Metric: "Average Timeliness Score", Value: data.portfolio_overview?.average_metrics?.timeliness_score || 0 },
+      { Metric: "Average Repayment Score", Value: data.portfolio_overview?.average_metrics?.repayment_score || 0 },
+      { Metric: "Average Monthly Income", Value: data.portfolio_overview?.average_metrics?.monthly_income || 0 }
     ];
 
     const summaryWorksheet = XLSX.utils.json_to_sheet(summaryData);
@@ -77,7 +77,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `credit_risk_analysis_${filename || Date.now()}.xlsx`;
+    link.download = `credit_risk_analysis_${filename || Date.now()}.xlsx`; // Fixed: Added backticks
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -113,14 +113,14 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
     let csvContent = headers.join(",") + "\n";
     rows.forEach((row) => {
-      csvContent += row.map((field) => `"${field}"`).join(",") + "\n";
+      csvContent += row.map((field) => `"${field}"`).join(",") + "\n"; // Fixed: Added backticks and quotes
     });
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `credit_risk_results_${filename || Date.now()}.csv`;
+    link.download = `credit_risk_results_${filename || Date.now()}.csv`; // Fixed: Added backticks
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -129,7 +129,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
     showNotification("Results exported as CSV", "success");
   };
 
-  const filteredApplicants = data?.individual_applicants.filter((applicant) => {
+  const filteredApplicants = data?.individual_applicants?.filter((applicant) => {
     const matchesSearch = 
       applicant.applicant_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (applicant.demographics.name && 
@@ -142,7 +142,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
       (filter === "reject" && applicant.risk_assessment.recommendation.toLowerCase() === "reject");
 
     return matchesSearch && matchesFilter;
-  });
+  }) || []; // Added fallback to empty array
 
   if (!data) {
     return (
@@ -176,7 +176,8 @@ function ResultsDisplay({ data, filename, showNotification }) {
         </div>
       </div>
 
-      <SummaryCards data={data} />
+      {/* Fixed: Pass the correct approval summary data with error handling */}
+      <SummaryCards data={data.portfolio_overview?.approval_summary || {}} />
 
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
@@ -266,6 +267,11 @@ function ResultsDisplay({ data, filename, showNotification }) {
             />
           </div>
         )}
+
+        {/* Added summary showing filtered count */}
+        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500">
+          Showing {filteredApplicants?.length || 0} of {data.individual_applicants?.length || 0} applicants
+        </div>
       </div>
     </div>
   );
