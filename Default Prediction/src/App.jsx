@@ -53,7 +53,6 @@ function AppInner() {
       if (response.ok) {
         const data = await response.json();
         setAnalysisHistory(data);
-        console.log("Order of history:", data);
       } else {
         console.error("Failed to fetch analysis history");
         setAnalysisHistory([]);
@@ -208,30 +207,41 @@ function AppInner() {
         jsonData: data.results,
       };
 
-      try {
-        const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
+      // Save to localStorage for users, backend for bankers
+      if (userType === "user") {
+        localStorage.setItem("userAnalysisData", JSON.stringify(data.results));
+        console.log("Analysis data saved to localStorage for user");
         
-        await fetchAnalysisHistory();
-
         setAnalysisData(newAnalysis);
         setShowModal(true);
-        showNotification(
-          "Analysis completed and saved successfully!",
-          "success"
-        );
-      } catch (saveError) {
-        console.error("Save error:", saveError);
+        showNotification("Analysis completed and saved locally!", "success");
+      } else {
+        // Keep existing banker logic unchanged
+        try {
+          const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
+          
+          await fetchAnalysisHistory();
 
-        setAnalysisData({
-          fileName: file.name,
-          jsonData: data.results,
-        });
+          setAnalysisData(newAnalysis);
+          setShowModal(true);
+          showNotification(
+            "Analysis completed and saved successfully!",
+            "success"
+          );
+        } catch (saveError) {
+          console.error("Save error:", saveError);
 
-        setShowModal(true);
-        showNotification(
-          "Analysis completed but failed to save to server.",
-          "warning"
-        );
+          setAnalysisData({
+            fileName: file.name,
+            jsonData: data.results,
+          });
+
+          setShowModal(true);
+          showNotification(
+            "Analysis completed but failed to save to server.",
+            "warning"
+          );
+        }
       }
     } catch (error) {
       console.error("Processing error:", error);
