@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SummaryCards from "./SummaryCards";
 import ApplicantCard from "./ApplicantCard";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 function ResultsDisplay({ data, filename, showNotification }) {
   const [expandedApplicant, setExpandedApplicant] = useState(null);
@@ -14,25 +14,33 @@ function ResultsDisplay({ data, filename, showNotification }) {
     // Prepare data for Excel export
     const excelData = data.individual_applicants.map((applicant) => ({
       "Applicant ID": applicant.applicant_id,
-      "Name": applicant.demographics.name || "N/A",
-      "Age": applicant.demographics.age,
-      "Gender": applicant.demographics.gender,
-      "Education": applicant.demographics.education,
-      "Employment": applicant.demographics.employment,
+      Name: applicant.demographics.name || "N/A",
+      Age: applicant.demographics.age,
+      Gender: applicant.demographics.gender,
+      Education: applicant.demographics.education,
+      Employment: applicant.demographics.employment,
       "Monthly Income": applicant.demographics.monthly_income,
       "Risk Level": applicant.risk_assessment.overall_risk,
       "Risk Color": applicant.risk_assessment.risk_color,
-      "Default Probability": `${(applicant.risk_assessment.default_probability * 100).toFixed(2)}%`, // Fixed: Added backticks
-      "Recommendation": applicant.risk_assessment.recommendation,
-      "Repayment Ability": applicant.top_decision_metrics.find(m => m.name === "Repayment Ability")?.value || "N/A",
-      "Timeliness Score": applicant.top_decision_metrics.find(m => m.name === "Payment Timeliness")?.value || "N/A",
+      "Default Probability": `${(
+        applicant.risk_assessment.default_probability * 100
+      ).toFixed(2)}%`, // Fixed: Added backticks
+      Recommendation: applicant.risk_assessment.recommendation,
+      "Repayment Ability":
+        applicant.top_decision_metrics.find(
+          (m) => m.name === "Repayment Ability"
+        )?.value || "N/A",
+      "Timeliness Score":
+        applicant.top_decision_metrics.find(
+          (m) => m.name === "Payment Timeliness"
+        )?.value || "N/A",
       "Loan Eligibility": applicant.loan_details.eligibility,
       "Min Loan Amount": applicant.loan_details.loan_range.minimum,
       "Max Loan Amount": applicant.loan_details.loan_range.maximum,
       "Suggested Term (Months)": applicant.loan_details.terms.tenure_months,
       "Monthly EMI": applicant.loan_details.terms.monthly_emi,
       "Interest Rate Min": applicant.loan_details.terms.interest_rate_range.min,
-      "Interest Rate Max": applicant.loan_details.terms.interest_rate_range.max
+      "Interest Rate Max": applicant.loan_details.terms.interest_rate_range.max,
     }));
 
     // Create workbook and worksheet
@@ -44,36 +52,104 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
     // Summary sheet - Added error handling
     const summaryData = [
-      { Metric: "Total Applicants", Value: data.analysis_metadata?.total_applicants || data.individual_applicants?.length || 0 },
-      { Metric: "Approved", Value: data.portfolio_overview?.approval_summary?.Approve || 0 },
-      { Metric: "Under Review", Value: data.portfolio_overview?.approval_summary?.Review || 0 },
-      { Metric: "Rejected", Value: data.portfolio_overview?.approval_summary?.Reject || 0 },
-      { Metric: "Low Risk", Value: data.portfolio_overview?.risk_distribution?.Low || 0 },
-      { Metric: "Medium Risk", Value: data.portfolio_overview?.risk_distribution?.Medium || 0 },
-      { Metric: "High Risk", Value: data.portfolio_overview?.risk_distribution?.High || 0 },
-      { Metric: "Total Loan Potential", Value: data.portfolio_overview?.total_loan_potential || 0 },
-      { Metric: "Average Default Probability", Value: `${((data.portfolio_overview?.average_metrics?.default_probability || 0) * 100).toFixed(2)}%` }, // Fixed: Added backticks
-      { Metric: "Average Timeliness Score", Value: data.portfolio_overview?.average_metrics?.timeliness_score || 0 },
-      { Metric: "Average Repayment Score", Value: data.portfolio_overview?.average_metrics?.repayment_score || 0 },
-      { Metric: "Average Monthly Income", Value: data.portfolio_overview?.average_metrics?.monthly_income || 0 }
+      {
+        Metric: "Total Applicants",
+        Value:
+          data.analysis_metadata?.total_applicants ||
+          data.individual_applicants?.length ||
+          0,
+      },
+      {
+        Metric: "Approved",
+        Value: data.portfolio_overview?.approval_summary?.Approve || 0,
+      },
+      {
+        Metric: "Under Review",
+        Value: data.portfolio_overview?.approval_summary?.Review || 0,
+      },
+      {
+        Metric: "Rejected",
+        Value: data.portfolio_overview?.approval_summary?.Reject || 0,
+      },
+      {
+        Metric: "Low Risk",
+        Value: data.portfolio_overview?.risk_distribution?.Low || 0,
+      },
+      {
+        Metric: "Medium Risk",
+        Value: data.portfolio_overview?.risk_distribution?.Medium || 0,
+      },
+      {
+        Metric: "High Risk",
+        Value: data.portfolio_overview?.risk_distribution?.High || 0,
+      },
+      {
+        Metric: "Total Loan Potential",
+        Value: data.portfolio_overview?.total_loan_potential || 0,
+      },
+      {
+        Metric: "Average Default Probability",
+        Value: `${(
+          (data.portfolio_overview?.average_metrics?.default_probability || 0) *
+          100
+        ).toFixed(2)}%`,
+      }, // Fixed: Added backticks
+      {
+        Metric: "Average Timeliness Score",
+        Value: data.portfolio_overview?.average_metrics?.timeliness_score || 0,
+      },
+      {
+        Metric: "Average Repayment Score",
+        Value: data.portfolio_overview?.average_metrics?.repayment_score || 0,
+      },
+      {
+        Metric: "Average Monthly Income",
+        Value: data.portfolio_overview?.average_metrics?.monthly_income || 0,
+      },
     ];
 
     const summaryWorksheet = XLSX.utils.json_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, "Portfolio Summary");
+    XLSX.utils.book_append_sheet(
+      workbook,
+      summaryWorksheet,
+      "Portfolio Summary"
+    );
 
     // Auto-width for columns (added one more for Repayment Ability)
     const colWidths = [
-      { wch: 15 }, { wch: 20 }, { wch: 8 }, { wch: 10 }, { wch: 15 }, 
-      { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 18 }, 
-      { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, 
-      { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 12 }, { wch: 12 }, 
-      { wch: 15 }, { wch: 15 }
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 8 },
+      { wch: 10 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 12 },
+      { wch: 12 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 12 },
+      { wch: 12 },
+      { wch: 15 },
+      { wch: 15 },
     ];
-    worksheet['!cols'] = colWidths;
+    worksheet["!cols"] = colWidths;
 
     // Generate and download Excel file
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -89,7 +165,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
   const handleExportCSV = () => {
     const headers = [
       "Applicant ID",
-      "Name", 
+      "Name",
       "Age",
       "Gender",
       "Monthly Income",
@@ -107,7 +183,8 @@ function ResultsDisplay({ data, filename, showNotification }) {
       applicant.demographics.monthly_income,
       applicant.risk_assessment.overall_risk,
       applicant.risk_assessment.recommendation,
-      applicant.top_decision_metrics.find(m => m.name === "Repayment Ability")?.value || "N/A",
+      applicant.top_decision_metrics.find((m) => m.name === "Repayment Ability")
+        ?.value || "N/A",
       applicant.risk_assessment.default_probability,
     ]);
 
@@ -129,20 +206,28 @@ function ResultsDisplay({ data, filename, showNotification }) {
     showNotification("Results exported as CSV", "success");
   };
 
-  const filteredApplicants = data?.individual_applicants?.filter((applicant) => {
-    const matchesSearch = 
-      applicant.applicant_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (applicant.demographics.name && 
-       applicant.demographics.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredApplicants =
+    data?.individual_applicants?.filter((applicant) => {
+      const matchesSearch =
+        applicant.applicant_id?.toString() === searchTerm ||
+        (applicant.demographics.name &&
+          applicant.demographics.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()));
 
-    const matchesFilter = 
-      filter === "all" ||
-      (filter === "approve" && applicant.risk_assessment.recommendation.toLowerCase() === "approve") ||
-      (filter === "review" && applicant.risk_assessment.recommendation.toLowerCase() === "review") ||
-      (filter === "reject" && applicant.risk_assessment.recommendation.toLowerCase() === "reject");
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "approve" &&
+          applicant.risk_assessment.recommendation.toLowerCase() ===
+            "approve") ||
+        (filter === "review" &&
+          applicant.risk_assessment.recommendation.toLowerCase() ===
+            "review") ||
+        (filter === "reject" &&
+          applicant.risk_assessment.recommendation.toLowerCase() === "reject");
 
-    return matchesSearch && matchesFilter;
-  }) || []; // Added fallback to empty array
+      return matchesSearch && matchesFilter;
+    }) || [];
 
   if (!data) {
     return (
@@ -181,7 +266,9 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">Individual Applicants</h3>
+          <h3 className="text-lg font-semibold text-gray-800">
+            Individual Applicants
+          </h3>
           <div className="flex space-x-4">
             <input
               type="text"
@@ -207,18 +294,39 @@ function ResultsDisplay({ data, filename, showNotification }) {
           <table className="min-w-full table-auto">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Income</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Decision</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repayment Ability</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Age
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Income
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Risk
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Decision
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Repayment Ability
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredApplicants.map((applicant) => (
-                <tr key={applicant.applicant_id} className="hover:bg-gray-50 cursor-pointer" 
-                    onClick={() => setExpandedApplicant(expandedApplicant === applicant.applicant_id ? null : applicant.applicant_id)}>
+                <tr
+                  key={applicant.applicant_id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() =>
+                    setExpandedApplicant(
+                      expandedApplicant === applicant.applicant_id
+                        ? null
+                        : applicant.applicant_id
+                    )
+                  }
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {applicant.applicant_id}
                   </td>
@@ -226,31 +334,51 @@ function ResultsDisplay({ data, filename, showNotification }) {
                     {applicant.demographics.age}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ₹{applicant.demographics.monthly_income?.toLocaleString() || 'N/A'}
+                    ₹
+                    {applicant.demographics.monthly_income?.toLocaleString() ||
+                      "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      applicant.risk_assessment.overall_risk.toLowerCase() === 'low' ? 'bg-green-100 text-green-800' :
-                      applicant.risk_assessment.overall_risk.toLowerCase() === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        applicant.risk_assessment.overall_risk.toLowerCase() ===
+                        "low"
+                          ? "bg-green-100 text-green-800"
+                          : applicant.risk_assessment.overall_risk.toLowerCase() ===
+                            "medium"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {applicant.risk_assessment.overall_risk}
                     </span>
                     <span className="ml-2 text-xs text-gray-500">
-                      ({(applicant.risk_assessment.default_probability * 100).toFixed(1)}%)
+                      (
+                      {(
+                        applicant.risk_assessment.default_probability * 100
+                      ).toFixed(1)}
+                      %)
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      applicant.risk_assessment.recommendation.toLowerCase() === 'approve' ? 'bg-green-100 text-green-800' :
-                      applicant.risk_assessment.recommendation.toLowerCase() === 'review' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        applicant.risk_assessment.recommendation.toLowerCase() ===
+                        "approve"
+                          ? "bg-green-100 text-green-800"
+                          : applicant.risk_assessment.recommendation.toLowerCase() ===
+                            "review"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {applicant.risk_assessment.recommendation}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {applicant.top_decision_metrics.find(m => m.name === "Repayment Ability")?.value || "N/A"}
+                    {applicant.top_decision_metrics.find(
+                      (m) => m.name === "Repayment Ability"
+                    )?.value || "N/A"}
                   </td>
                 </tr>
               ))}
@@ -261,7 +389,9 @@ function ResultsDisplay({ data, filename, showNotification }) {
         {expandedApplicant && (
           <div className="mt-4">
             <ApplicantCard
-              applicant={data.individual_applicants.find(a => a.applicant_id === expandedApplicant)}
+              applicant={data.individual_applicants.find(
+                (a) => a.applicant_id === expandedApplicant
+              )}
               isExpanded={true}
               onToggle={() => setExpandedApplicant(null)}
             />
@@ -270,7 +400,8 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
         {/* Added summary showing filtered count */}
         <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500">
-          Showing {filteredApplicants?.length || 0} of {data.individual_applicants?.length || 0} applicants
+          Showing {filteredApplicants?.length || 0} of{" "}
+          {data.individual_applicants?.length || 0} applicants
         </div>
       </div>
     </div>
