@@ -27,7 +27,7 @@ function AppInner() {
   const [analysisHistory, setAnalysisHistory] = useState([]);
   const [booting, setBooting] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token")); // Add login state
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const navigate = useNavigate();
 
   const userType = localStorage.getItem("userType");
@@ -37,7 +37,7 @@ function AppInner() {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        setAnalysisHistory([]); // Clear history if no token
+        setAnalysisHistory([]);
         return;
       }
 
@@ -55,13 +55,50 @@ function AppInner() {
         console.log("Order of history:", data);
       } else {
         console.error("Failed to fetch analysis history");
-        setAnalysisHistory([]); // Clear history on error
+        setAnalysisHistory([]);
       }
     } catch (error) {
       console.error("Error fetching analysis history:", error);
-      setAnalysisHistory([]); // Clear history on error
+      setAnalysisHistory([]);
     }
   }, []);
+
+  // Function to delete analysis from backend
+  const handleDeleteAnalysis = async (analysis) => {
+    try {
+      const token = localStorage.getItem("token");
+      const analysisId = analysis._id || analysis.id;
+      
+      const response = await fetch(
+        `http://localhost:4000/results/DeleteResult/${analysisId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "auth-token": token,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove from local state immediately for better UX
+        setAnalysisHistory(prev => 
+          prev.filter(item => (item._id || item.id) !== analysisId)
+        );
+        
+        showNotification("Analysis deleted successfully", "success");
+      } else {
+        const errorData = await response.json();
+        showNotification(
+          `Failed to delete analysis: ${errorData.message || response.statusText}`,
+          "error"
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting analysis:", error);
+      showNotification("Error deleting analysis", "error");
+    }
+  };
 
   // Listen for auth changes (login/logout)
   useEffect(() => {
@@ -73,18 +110,13 @@ function AppInner() {
       setIsLoggedIn(loggedIn);
       
       if (loggedIn) {
-        // Fetch history immediately after login
         fetchAnalysisHistory();
       } else {
-        // Clear history on logout
         setAnalysisHistory([]);
       }
     };
 
-    // Listen for the custom auth-change event from Login component
     window.addEventListener("auth-change", handleAuthChange);
-    
-    // Also listen for storage changes (in case of logout from another tab)
     window.addEventListener("storage", handleAuthChange);
 
     return () => {
@@ -178,7 +210,6 @@ function AppInner() {
       try {
         const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
         
-        // Refresh the analysis history from backend to get the latest data
         await fetchAnalysisHistory();
 
         setAnalysisData(newAnalysis);
@@ -215,10 +246,9 @@ function AppInner() {
     showNotification("Analysis loaded from history", "success");
   };
 
-  // Single modal close handler
   const handleCloseModal = () => {
     setShowModal(false);
-    setAnalysisData(null); // Clear data when closing
+    setAnalysisData(null);
   };
 
   if (booting) return <LoadingOverlay />;
@@ -300,6 +330,7 @@ function AppInner() {
                   history={analysisHistory}
                   onLoadAnalysis={handleLoadFromHistory}
                   showNotification={showNotification}
+                  onDeleteAnalysis={handleDeleteAnalysis}
                   userType={userType}
                 />
               </Layout>
