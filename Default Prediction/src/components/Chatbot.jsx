@@ -85,7 +85,7 @@ const Chatbot = ({ onClose }) => {
     setTimeout(() => inputRef.current?.focus(), 150);
   }, [hasAnalysisData]);
 
-  // Let Gemini do the thinking - minimal preprocessing
+  // Enhanced Gemini API call with comprehensive FinShield context
   const callGeminiAPI = async (userInput) => {
     const apiKey = "AIzaSyCeKifrVWpgoQ1Qz6FnmJUFDKH1vAcgGns";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
@@ -95,30 +95,77 @@ const Chatbot = ({ onClose }) => {
     if (useAnalysisData && hasAnalysisData) {
       const userData = getUserAnalysisData();
 
-      // Give Gemini the data AND a focused instruction
-      prompt = `You are a credit analysis expert. The user is asking a specific question about their financial situation. Answer directly and precisely.
+      // Enhanced prompt with comprehensive FinShield context
+      prompt = `You are FinShield's AI Credit Coach, an expert financial advisor specializing in credit risk analysis and loan approval predictions.
 
-USER'S COMPLETE FINANCIAL DATA:
+ABOUT FINSHIELD RISK ANALYZER:
+FinShield is an advanced AI-powered credit risk assessment platform that:
+- Analyzes comprehensive financial data to predict loan default probability
+- Evaluates 40+ financial parameters including income, expenses, behavioral patterns, digital footprints
+- Categorizes applicants into risk levels: Low Risk (<7% default), Medium Risk (7-18% default), High Risk (>18% default)
+- Provides personalized financial health scores, timeliness scores, and repayment ability assessments
+- Helps lenders make informed loan approval decisions
+- Assists individuals in understanding and improving their creditworthiness
+
+RISK ASSESSMENT METHODOLOGY:
+- Low Risk (Green): <18% default probability → Usually approved for loans
+- Medium Risk (Yellow): 18-42% default probability → Requires review, conditional approval
+- High Risk (Red): >42% default probability → Usually rejected or requires collateral
+
+USER'S COMPLETE FINANCIAL ANALYSIS DATA:
 ${JSON.stringify(userData, null, 2)}
 
 USER QUESTION: "${userInput}"
 
-CRITICAL INSTRUCTIONS:
-- Answer their specific question DIRECTLY - no introductions or explanations about FinShield
-- Use their actual financial data from above for calculations
-- For loan amount questions: Calculate based on their income, existing debt, risk profile, and debt-to-income ratios
-- For risk questions: Reference their actual scores and probabilities
-- Be specific with numbers from their data
-- Keep response focused and actionable (3-5 sentences max)
+RESPONSE GUIDELINES:
+- Answer their specific question DIRECTLY using their actual financial data
+- Reference specific numbers, percentages, and scores from their profile
+- For loan amount questions: Calculate realistic amounts based on income (typically 4-6x annual income minus existing debt)
+- For risk questions: Explain their category and what it means for loan approval
+- For improvement questions: Provide specific, actionable steps based on their weak areas
+- Use emojis appropriately and maintain a supportive, professional tone
+- Keep responses focused and practical (3-6 sentences)
+- Compare their metrics to industry standards when relevant
 
-Think about their question and use their real financial data to give a precise, helpful answer.`;
+EXPECTED OUTPUT FORMAT:
+- Start with a direct answer to their question
+- Include relevant numbers from their data
+- Provide actionable insights or next steps
+- End with encouragement or additional context if helpful`;
     } else {
-      // No personal data available
-      prompt = `You are a helpful financial advisor. Answer this question directly:
+      // Enhanced general prompt without personal data
+      prompt = `You are FinShield's AI Credit Coach, a financial advisor specializing in credit analysis and risk assessment.
+
+ABOUT FINSHIELD RISK ANALYZER:
+FinShield is an AI-powered credit risk assessment platform that:
+- Analyzes comprehensive financial profiles to predict loan default probability
+- Evaluates income, expenses, employment history, behavioral patterns, and digital footprints
+- Categorizes risk levels: Low Risk (<7% default), Medium Risk (7-18%), High Risk (>18%)
+- Provides financial health scores and personalized improvement recommendations
+- Helps both lenders and individuals make better financial decisions
+
+PLATFORM CAPABILITIES:
+- File Upload: Supports CSV, Excel, JSON formats with financial data
+- Risk Analysis: Comprehensive evaluation of 40+ financial parameters
+- Scoring System: Financial health, timeliness, repayment ability scores
+- Recommendations: Personalized advice for credit improvement
+- Dashboard: Visual analytics and historical analysis tracking
 
 USER QUESTION: "${userInput}"
 
-Give a focused, helpful answer without unnecessary introductions.`;
+RESPONSE GUIDELINES:
+- Provide helpful, accurate information about credit analysis and FinShield features
+- Explain financial concepts in simple, understandable terms
+- Give actionable advice for credit improvement
+- Use emojis appropriately and maintain a professional yet friendly tone
+- Keep responses concise and focused (3-5 sentences)
+- If asked about specific calculations, explain the methodology clearly
+
+EXPECTED OUTPUT FORMAT:
+- Direct answer to their question
+- Clear explanations with examples when helpful
+- Actionable next steps or recommendations
+- Encourage them to use FinShield's analysis features when relevant`;
     }
 
     if (!apiKey) {
@@ -133,10 +180,10 @@ Give a focused, helpful answer without unnecessary introductions.`;
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.4, // Balanced - focused but still analytical
+          temperature: 0.6, // Slightly higher for more conversational responses
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 800, // Enough for detailed analysis but not too long
+          maxOutputTokens: 1000, // Increased for more detailed responses
         },
       }),
     });
@@ -167,22 +214,22 @@ Give a focused, helpful answer without unnecessary introductions.`;
     try {
       const reply = await callGeminiAPI(trimmed);
 
-      // Dynamic suggestions based on context
+      // Enhanced dynamic suggestions based on context
       const suggestions =
         useAnalysisData && hasAnalysisData
           ? [
-              "Analyze my financial health",
-              "How to improve my credit score",
-              "Explain my risk assessment",
-              "What are my strongest areas?",
-              "Loan approval strategies",
+              "What's my loan approval probability?",
+              "How can I improve my risk score?", 
+              "Explain my financial health score",
+              "What's my maximum loan amount?",
+              "Compare my profile to standards"
             ]
           : [
-              "What does FinShield do?",
-              "File upload requirements",
-              "Understanding risk scores",
-              "Getting started guide",
-              "Platform features",
+              "How does FinShield risk analysis work?",
+              "What file formats are supported?",
+              "Explain risk categories and scoring",
+              "How to improve creditworthiness?",
+              "What data does FinShield analyze?"
             ];
 
       pushMessage({
@@ -193,7 +240,7 @@ Give a focused, helpful answer without unnecessary introductions.`;
     } catch (error) {
       console.error("Gemini API error:", error);
 
-      // Show error message to user instead of fallback
+      // Show error message to user
       pushMessage({
         sender: "bot",
         text: `❌ **Error**: ${error.message}\n\nPlease check your API key configuration or try again later.`,
@@ -236,6 +283,7 @@ Give a focused, helpful answer without unnecessary introductions.`;
     }
   };
 
+  // Rest of the JSX remains the same...
   return (
     <>
       {/* Inline CSS for animations */}
@@ -417,6 +465,11 @@ Give a focused, helpful answer without unnecessary introductions.`;
                 ref={inputRef}
                 rows={1}
                 className="w-full max-h-28 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400 overflow-hidden"
+                placeholder={
+                  useAnalysisData
+                    ? "Ask about your credit analysis, risk scores, or how to improve..."
+                    : "Ask about FinShield, data uploads, risk scores..."
+                }
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}

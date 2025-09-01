@@ -6,3 +6,5 @@ joblib
 odfpy 
 openpyxl 
 xlrd
+numpy
+xgboost

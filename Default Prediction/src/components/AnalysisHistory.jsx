@@ -530,54 +530,7 @@ function AnalysisHistory({
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <span className="text-blue-400">ℹ️</span>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">
-                {userType === "user"
-                  ? "Personal Analysis Summary"
-                  : "Analysis Summary"}
-              </h3>
-              <div className="mt-2 text-sm text-blue-700">
-                {userType === "user" ? (
-                  <>
-                    <p>
-                      • Click on any row to view your detailed credit analysis
-                      report
-                    </p>
-                    <p>
-                      • Risk categories: Low Risk (Good), Medium Risk (Review),
-                      High Risk (Needs Improvement)
-                    </p>
-                    <p>
-                      • Your risk score and monthly income help determine your
-                      creditworthiness
-                    </p>
-                    <p>
-                      • Higher income and lower risk scores generally indicate
-                      better loan terms
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p>• Click on any row to view detailed analysis results</p>
-                    <p>
-                      • Risk categories: Low Risk (Green), Medium Risk (Yellow),
-                      High Risk (Red - combines High & Very High)
-                    </p>
-                    <p>
-                      • Average risk score and default probability shown for
-                      quick comparison
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       {selectedAnalysis && (

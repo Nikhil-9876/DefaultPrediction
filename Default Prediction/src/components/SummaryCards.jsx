@@ -7,15 +7,15 @@ function SummaryCards({ data }) {
       type: "Approve",
       title: "Approved",
       icon: "fa-check-circle",
-      bgColor: "bg-green-500",
+      bgColor: "bg-green-600",
       textColor: "text-white"
     },
     {
       type: "Review",
       title: "Needs Review",
       icon: "fa-exclamation-circle",
-      bgColor: "bg-yellow-400",
-      textColor: "text-gray-800"
+      bgColor: "bg-yellow-500",
+      textColor: "text-white"
     },
     {
       type: "Reject",

@@ -390,13 +390,6 @@ function ResultsDisplay({ data, filename, showNotification }) {
           </div>
         </div>
 
-        <div className="text-sm text-gray-600 mb-4 flex flex-wrap gap-4">
-          <span>• Total Records: {data.length}</span>
-          <span>• Fields Per Record: {allFields.length}</span>
-          <span>• Export includes all {allFields.length} fields from the analysis</span>
-          <span>• Click on any row to view detailed analysis</span>
-        </div>
-
         {/* Table Header */}
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
