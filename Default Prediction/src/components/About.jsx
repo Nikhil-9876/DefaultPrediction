@@ -462,7 +462,7 @@ function About() {
     setPopupImage(null);
   };
 
-  const handleTryFinShield = () => {
+  const handleTryRiskAnalyzer = () => {
     navigate('/analyze');
   };
 
@@ -472,7 +472,7 @@ function About() {
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            About FinShield
+            About RiskAnalyzer
           </h1>
           
         </div>
@@ -486,7 +486,7 @@ function About() {
           
           <div className="prose prose-lg text-gray-700">
             <p className="mb-4">
-              <strong>FinShield</strong> was built to modernize credit risk assessment. Traditional scoring relies heavily on past credit history, often excluding new-to-credit or thin-file borrowers. Our AI-powered system bridges this gap by delivering:
+              <strong>RiskAnalyzer</strong> was built to modernize credit risk assessment. Traditional scoring relies heavily on past credit history, often excluding new-to-credit or thin-file borrowers. Our AI-powered system bridges this gap by delivering:
             </p>
             <ul className="list-disc pl-6 mb-4">
               <li>Reduced defaults through accurate, data-driven prediction.</li>
@@ -496,7 +496,7 @@ function About() {
               <li>Scalable deployment across multiple loan types with risk-adjusted modeling.</li>
             </ul>
             <p>
-              Unlike traditional methods that depend only on bureau scores, <strong>FinShield</strong> combines advanced machine learning with diverse data sources, empowering institutions to make faster, fairer, and more reliable lending decisions while minimizing risk.
+              Unlike traditional methods that depend only on bureau scores, <strong>RiskAnalyzer</strong> combines advanced machine learning with diverse data sources, empowering institutions to make faster, fairer, and more reliable lending decisions while minimizing risk.
             </p>
           </div>
         </div>
@@ -687,10 +687,10 @@ function About() {
         {/* CTA Section */}
         <div className="text-center mt-12">
           <button
-            onClick={handleTryFinShield}
+            onClick={handleTryRiskAnalyzer}
             className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
-            Try FinShield Now
+            Try RiskAnalyzer Now
             <ArrowRightIcon className="ml-2 h-5 w-5" />
           </button>
         </div>

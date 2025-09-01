@@ -65,9 +65,9 @@ const Chatbot = ({ onClose }) => {
   useEffect(() => {
     const welcomeMessage = {
       sender: "bot",
-      text: "👋 Hi! I'm your FinShield Credit Coach powered by Gemini. I'm here to help you understand your credit analysis and suggest ways to improve your financial health:",
+      text: "👋 Hi! I'm your RiskAnalyzer Credit Coach. I'm here to help you understand your credit analysis and suggest ways to improve your financial health:",
       suggestions: [
-        "What does FinShield do?",
+        "What does RiskAnalyzer do?",
         "How to upload data files",
         "Understanding risk scores",
         "File format requirements",
@@ -85,7 +85,7 @@ const Chatbot = ({ onClose }) => {
     setTimeout(() => inputRef.current?.focus(), 150);
   }, [hasAnalysisData]);
 
-  // Enhanced Gemini API call with comprehensive FinShield context
+  // Enhanced Gemini API call with comprehensive RiskAnalyzer context
   const callGeminiAPI = async (userInput) => {
     const apiKey = "AIzaSyCeKifrVWpgoQ1Qz6FnmJUFDKH1vAcgGns";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
@@ -95,14 +95,14 @@ const Chatbot = ({ onClose }) => {
     if (useAnalysisData && hasAnalysisData) {
       const userData = getUserAnalysisData();
 
-      // Enhanced prompt with comprehensive FinShield context
-      prompt = `You are FinShield's AI Credit Coach, an expert financial advisor specializing in credit risk analysis and loan approval predictions.
+      // Enhanced prompt with comprehensive RiskAnalyzer context
+      prompt = `You are RiskAnalyzer's AI Credit Coach, an expert financial advisor specializing in credit risk analysis and loan approval predictions.
 
-ABOUT FINSHIELD RISK ANALYZER:
-FinShield is an advanced AI-powered credit risk assessment platform that:
+ABOUT RiskAnalyzer RISK ANALYZER:
+RiskAnalyzer is an advanced AI-powered credit risk assessment platform that:
 - Analyzes comprehensive financial data to predict loan default probability
 - Evaluates 40+ financial parameters including income, expenses, behavioral patterns, digital footprints
-- Categorizes applicants into risk levels: Low Risk (<7% default), Medium Risk (7-18% default), High Risk (>18% default)
+- Categorizes applicants into risk levels: Low Risk (<18% default), Medium Risk (18-42% default), High Risk (42-68% default),High Risk (68%> default)
 - Provides personalized financial health scores, timeliness scores, and repayment ability assessments
 - Helps lenders make informed loan approval decisions
 - Assists individuals in understanding and improving their creditworthiness
@@ -134,13 +134,13 @@ EXPECTED OUTPUT FORMAT:
 - End with encouragement or additional context if helpful`;
     } else {
       // Enhanced general prompt without personal data
-      prompt = `You are FinShield's AI Credit Coach, a financial advisor specializing in credit analysis and risk assessment.
+      prompt = `You are RiskAnalyzer's AI Credit Coach, a financial advisor specializing in credit analysis and risk assessment.
 
-ABOUT FINSHIELD RISK ANALYZER:
-FinShield is an AI-powered credit risk assessment platform that:
+ABOUT RiskAnalyzer RISK ANALYZER:
+RiskAnalyzer is an AI-powered credit risk assessment platform that:
 - Analyzes comprehensive financial profiles to predict loan default probability
 - Evaluates income, expenses, employment history, behavioral patterns, and digital footprints
-- Categorizes risk levels: Low Risk (<7% default), Medium Risk (7-18%), High Risk (>18%)
+- Categorizes risk levels: Low Risk (<18% default), Medium Risk (18-42% default), High Risk (42-68% default),High Risk (68%> default)
 - Provides financial health scores and personalized improvement recommendations
 - Helps both lenders and individuals make better financial decisions
 
@@ -154,7 +154,7 @@ PLATFORM CAPABILITIES:
 USER QUESTION: "${userInput}"
 
 RESPONSE GUIDELINES:
-- Provide helpful, accurate information about credit analysis and FinShield features
+- Provide helpful, accurate information about credit analysis and RiskAnalyzer features
 - Explain financial concepts in simple, understandable terms
 - Give actionable advice for credit improvement
 - Use emojis appropriately and maintain a professional yet friendly tone
@@ -165,7 +165,7 @@ EXPECTED OUTPUT FORMAT:
 - Direct answer to their question
 - Clear explanations with examples when helpful
 - Actionable next steps or recommendations
-- Encourage them to use FinShield's analysis features when relevant`;
+- Encourage them to use RiskAnalyzer's analysis features when relevant`;
     }
 
     if (!apiKey) {
@@ -225,11 +225,11 @@ EXPECTED OUTPUT FORMAT:
               "Compare my profile to standards"
             ]
           : [
-              "How does FinShield risk analysis work?",
+              "How does RiskAnalyzer risk analysis work?",
               "What file formats are supported?",
               "Explain risk categories and scoring",
               "How to improve creditworthiness?",
-              "What data does FinShield analyze?"
+              "What data does RiskAnalyzer analyze?"
             ];
 
       pushMessage({
@@ -333,7 +333,7 @@ EXPECTED OUTPUT FORMAT:
         ref={chatbotRef}
         role="dialog"
         aria-modal="true"
-        aria-label="FinShield Credit Coach"
+        aria-label="RiskAnalyzer Credit Coach"
         className={`fixed z-50 inset-x-0 bottom-0 mx-auto sm:bottom-24 sm:right-6 sm:left-auto sm:inset-x-auto w-full sm:w-[420px] h-[72vh] sm:h-[560px] bg-white/95 backdrop-blur border border-gray-200 shadow-2xl rounded-xl flex flex-col ${
           isClosing ? "chatbot-slide-out" : "chatbot-slide-in"
         }`}
@@ -346,9 +346,8 @@ EXPECTED OUTPUT FORMAT:
             </div>
             <div className="min-w-0">
               <h3 className="font-semibold leading-tight truncate">
-                FinShield Credit Coach
+                RiskAnalyzer Credit Coach
               </h3>
-              <p className="text-[11px] text-purple-100">Powered by Gemini</p>
             </div>
           </div>
           <button
@@ -468,7 +467,7 @@ EXPECTED OUTPUT FORMAT:
                 placeholder={
                   useAnalysisData
                     ? "Ask about your credit analysis, risk scores, or how to improve..."
-                    : "Ask about FinShield, data uploads, risk scores..."
+                    : "Ask about RiskAnalyzer, data uploads, risk scores..."
                 }
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
