@@ -205,10 +205,10 @@ function FileUpload({ onProcess, isLoading }) {
           <li>First row should contain column headers</li>
           <li>Ensure all required fields have valid numerical values</li>
           <li className="w-full">
-            Required columns (39 total):
+            Required columns 33:
             <div className="w-full mt-2">
               <div className="font-mono text-xs text-gray-600 bg-gray-100 p-3 rounded-lg overflow-x-auto max-h-32 overflow-y-auto">
-                applicant_id, application_date, age, gender, education_level, employment_type, marital_status, family_size, number_of_dependents, location_type, monthly_income_inr, spouse_income_inr, monthly_expenses_inr, monthly_savings_inr, monthly_utility_bills_inr, property_value_inr, vehicle_value_inr, total_investments_inr, outstanding_loan_amount_inr, years_current_employment, banking_relationship_years, monthly_business_revenue_inr, daily_mobile_hours, monthly_digital_transactions, avg_transaction_amount_inr, social_media_accounts_count, mobile_app_usage_intensity_score, digital_payment_adoption_score, utility_payment_regularity_score, location_stability_score, mobile_banking_usage_score, payment_reliability_score, financial_health_score, stability_index, timeliness_score, repayment_ability_score, probability_of_default, data_completeness_pct, consent_status, explainability_support_flag
+              applicant_id,application_date,age,gender,education_level,employment_type,marital_status,family_size,number_of_dependents,location_type,monthly_income_inr,spouse_income_inr,monthly_expenses_inr,monthly_savings_inr,monthly_utility_bills_inr,property_value_inr,vehicle_value_inr,total_investments_inr,outstanding_loan_amount_inr,loan_amount_applied_inr,years_current_employment,banking_relationship_years,monthly_business_revenue_inr,daily_mobile_hours,monthly_digital_transactions,avg_transaction_amount_inr,social_media_accounts_count,mobile_app_usage_intensity_score,digital_payment_adoption_score,consent_status,city,loan_type,interest_rate
               </div>
             </div>
           </li>
