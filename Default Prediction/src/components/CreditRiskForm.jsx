@@ -44,7 +44,7 @@ function CreditRiskForm({ onProcess, isLoading }) {
   };
 
   const [formData, setFormData] = useState({
-    // Personal Information (8 fields - removed location_type)
+    // Personal Information
     applicant_id: "",
     application_date: new Date().toISOString().split("T")[0],
     age: "",
@@ -55,8 +55,9 @@ function CreditRiskForm({ onProcess, isLoading }) {
     family_size: "",
     number_of_dependents: "0",
 
-    // Location & Financial Information (12 fields - location_type auto-mapped)
+    // Location & Financial Information
     city: "",
+    location_type: "", // Auto-mapped from city
     monthly_income_inr: "",
     spouse_income_inr: "0",
     monthly_expenses_inr: "",
@@ -69,24 +70,26 @@ function CreditRiskForm({ onProcess, isLoading }) {
     loan_amount_applied_inr: "",
     monthly_business_revenue_inr: "0",
 
-    // Employment & Banking (2 fields)
+    // Loan Information
+    loan_type: "",
+    interest_rate: "",
+
+    // Employment & Banking
     years_current_employment: "",
     banking_relationship_years: "",
 
-    // Digital Behavior (4 fields)
+    // Digital Behavior
     daily_mobile_hours: "",
     monthly_digital_transactions: "",
     avg_transaction_amount_inr: "0",
     social_media_accounts_count: "0",
 
-    // Risk Scores (2 fields only)
+    // Risk Scores
     mobile_app_usage_intensity_score: "50",
     digital_payment_adoption_score: "50",
 
-    // System Fields (3 fields)
-    data_completeness_pct: "100",
+    // System Fields
     consent_status: "granted",
-    explainability_support_flag: "1",
   });
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -181,6 +184,16 @@ function CreditRiskForm({ onProcess, isLoading }) {
             newErrors.loan_amount_applied_inr =
               "Loan amount is required and must be greater than 0";
           }
+          if (!formData.loan_type) {
+            newErrors.loan_type = "Loan type is required";
+          }
+          if (
+            !formData.interest_rate ||
+            parseFloat(formData.interest_rate) <= 0 ||
+            parseFloat(formData.interest_rate) > 50
+          ) {
+            newErrors.interest_rate = "Interest rate must be between 0.1% and 50%";
+          }
           break;
 
         case 2:
@@ -267,8 +280,23 @@ function CreditRiskForm({ onProcess, isLoading }) {
   }, []);
 
   const convertToCSV = useCallback((data) => {
-    const headers = Object.keys(data);
-    const values = Object.values(data);
+    // Define the exact order as per your CSV header
+    const orderedFields = [
+      'applicant_id', 'application_date', 'age', 'gender', 'education_level', 
+      'employment_type', 'marital_status', 'family_size', 'number_of_dependents', 
+      'location_type', 'monthly_income_inr', 'spouse_income_inr', 'monthly_expenses_inr', 
+      'monthly_savings_inr', 'monthly_utility_bills_inr', 'property_value_inr', 
+      'vehicle_value_inr', 'total_investments_inr', 'outstanding_loan_amount_inr', 
+      'loan_amount_applied_inr', 'years_current_employment', 'banking_relationship_years', 
+      'monthly_business_revenue_inr', 'daily_mobile_hours', 'monthly_digital_transactions', 
+      'avg_transaction_amount_inr', 'social_media_accounts_count', 
+      'mobile_app_usage_intensity_score', 'digital_payment_adoption_score', 
+      'consent_status', 'city', 'loan_type', 'interest_rate'
+    ];
+
+    const headers = orderedFields;
+    const values = orderedFields.map(field => data[field] || '');
+    
     const escapedValues = values.map((value) => {
       const stringValue = String(value);
       if (
@@ -743,6 +771,65 @@ function CreditRiskForm({ onProcess, isLoading }) {
             <p id="loan-amount-error" className="text-red-500 text-sm mt-1 flex items-center">
               <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
               {errors.loan_amount_applied_inr}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Loan Type *
+          </label>
+          <select
+            name="loan_type"
+            value={formData.loan_type}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.loan_type ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+            aria-describedby={errors.loan_type ? "loan-type-error" : undefined}
+          >
+            <option value="">Select Loan Type</option>
+            <option value="personal loan">Personal Loan</option>
+            <option value="home loan">Home Loan</option>
+            <option value="auto loan">Auto Loan</option>
+            <option value="education loan">Education Loan</option>
+            <option value="business loan">Business Loan</option>
+            <option value="credit card">Credit Card</option>
+            <option value="gold loan">Gold Loan</option>
+          </select>
+          {errors.loan_type && (
+            <p id="loan-type-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.loan_type}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Interest Rate (%) *
+          </label>
+          <input
+            type="number"
+            name="interest_rate"
+            value={formData.interest_rate}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0.1"
+            max="50"
+            step="0.1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.interest_rate ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+            aria-describedby={errors.interest_rate ? "interest-rate-error" : undefined}
+          />
+          {errors.interest_rate && (
+            <p id="interest-rate-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.interest_rate}
             </p>
           )}
         </div>
