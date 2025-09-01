@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 // Import Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
 import HistoryIcon from "@mui/icons-material/History";
-import DownloadIcon from "@mui/icons-material/Download";
+import DescriptionIcon from "@mui/icons-material/Description"; // Already imported - perfect for files
 import PieChartIcon from "@mui/icons-material/PieChart";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import DescriptionIcon from "@mui/icons-material/Description";
 import GroupIcon from "@mui/icons-material/Group";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -53,7 +52,7 @@ function Dashboard({ history, onLoadAnalysis }) {
   const portfolioStats = getTotalPortfolioStats(history);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pl-6 pt-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
@@ -165,7 +164,7 @@ function Dashboard({ history, onLoadAnalysis }) {
         >
           <div className="flex flex-col items-center text-center">
             <div className="relative mb-4">
-              <DownloadIcon
+              <DescriptionIcon
                 style={{
                   fontSize: 48,
                   color: "#a855f7",

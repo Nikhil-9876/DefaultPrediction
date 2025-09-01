@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { PaperAirplaneIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/solid";
 
 const Chatbot = ({ onClose }) => {
   const [messages, setMessages] = useState([]);
@@ -283,7 +283,6 @@ EXPECTED OUTPUT FORMAT:
     }
   };
 
-  // Rest of the JSX remains the same...
   return (
     <>
       {/* Inline CSS for animations */}
@@ -341,8 +340,8 @@ EXPECTED OUTPUT FORMAT:
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-xl">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 bg-white/20 rounded-full grid place-items-center">
-              <i className="fas fa-robot text-lg" aria-hidden="true"></i>
+            <div className="w-9 h-9 bg-white/20 rounded-full grid place-items-center border border-white/20">
+              <ChatBubbleLeftRightIcon className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
               <h3 className="font-semibold leading-tight truncate">
@@ -464,11 +463,6 @@ EXPECTED OUTPUT FORMAT:
                 ref={inputRef}
                 rows={1}
                 className="w-full max-h-28 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400 overflow-hidden"
-                placeholder={
-                  useAnalysisData
-                    ? "Ask about your credit analysis, risk scores, or how to improve..."
-                    : "Ask about RiskAnalyzer, data uploads, risk scores..."
-                }
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}

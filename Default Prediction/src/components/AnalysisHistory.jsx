@@ -160,7 +160,7 @@ function AnalysisHistory({
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 pt-6 pl-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
             {userType === "user" ? "My Analysis History" : "Analysis History"}

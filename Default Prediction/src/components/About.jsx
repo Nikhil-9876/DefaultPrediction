@@ -467,44 +467,43 @@ function About() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 pl-6 py-6">
+      <div className="max-w-7xl">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-left mb-12">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
             About RiskAnalyzer
           </h1>
-          
         </div>
 
         {/* Our Motive Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-            <LightBulbIcon className="h-8 w-8 text-blue-600 mr-3" />
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+            <LightBulbIcon className="h-6 w-6 text-blue-600 mr-3" />
             Our Motive
           </h2>
           
           <div className="prose prose-lg text-gray-700">
-            <p className="mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               <strong>RiskAnalyzer</strong> was built to modernize credit risk assessment. Traditional scoring relies heavily on past credit history, often excluding new-to-credit or thin-file borrowers. Our AI-powered system bridges this gap by delivering:
             </p>
-            <ul className="list-disc pl-6 mb-4">
+            <ul className="list-disc pl-6 mb-4 text-sm text-gray-500">
               <li>Reduced defaults through accurate, data-driven prediction.</li>
               <li>Faster loan approvals with real-time scoring in under 2 seconds.</li>
               <li>Inclusive decisions by leveraging alternative data like mobile usage, utility payments, and digital transactions.</li>
               <li>Explainable AI that clearly shows why each decision is made, fostering trust with lenders and borrowers.</li>
               <li>Scalable deployment across multiple loan types with risk-adjusted modeling.</li>
             </ul>
-            <p>
+            <p className="text-sm text-gray-500">
               Unlike traditional methods that depend only on bureau scores, <strong>RiskAnalyzer</strong> combines advanced machine learning with diverse data sources, empowering institutions to make faster, fairer, and more reliable lending decisions while minimizing risk.
             </p>
           </div>
         </div>
 
         {/* Dataset Overview Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-            <DocumentTextIcon className="h-8 w-8 text-green-600 mr-3" />
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+            <DocumentTextIcon className="h-6 w-6 text-green-600 mr-3" />
             Credit Risk Dataset Overview
           </h2>
           
@@ -513,7 +512,7 @@ function About() {
             {datasetOverview.map((stat, index) => (
               <div key={index} className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-blue-800 mb-1">{stat.value}</div>
-                <div className="text-sm font-semibold text-gray-900 mb-1">{stat.label}</div>
+                <div className="text-sm font-medium text-gray-800 mb-1">{stat.label}</div>
                 <div className="text-xs text-blue-700">{stat.description}</div>
               </div>
             ))}
@@ -521,7 +520,7 @@ function About() {
 
           {/* Column Details with Scroll */}
           <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Complete Column Documentation</h3>
+            <h3 className="font-medium text-gray-800 mb-4">Complete Column Documentation</h3>
             <div className="bg-gray-50 rounded-lg border max-h-96 overflow-y-auto">
               {columnCategories.map((category, categoryIndex) => {
                 const IconComponent = category.icon;
@@ -530,21 +529,21 @@ function About() {
                     <div className="sticky top-0 bg-gray-100 p-4 border-b border-gray-300">
                       <div className="flex items-center">
                         <IconComponent className="h-5 w-5 text-blue-600 mr-2" />
-                        <h4 className="text-lg font-semibold text-gray-900">{category.category}</h4>
+                        <h4 className="font-medium text-gray-800">{category.category}</h4>
                       </div>
                     </div>
                     <div className="p-4 space-y-3">
                       {category.columns.map((column, columnIndex) => (
                         <div key={columnIndex} className="bg-white rounded-lg p-3 border border-gray-200">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="font-mono text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            <span className="font-mono text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                               {column.name}
                             </span>
                             <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
                               {column.type}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">{column.details}</p>
+                          <p className="text-xs text-gray-600">{column.details}</p>
                         </div>
                       ))}
                     </div>
@@ -556,9 +555,9 @@ function About() {
         </div>
 
         {/* Updated Our Approach Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-            <CpuChipIcon className="h-8 w-8 text-purple-600 mr-3" />
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+            <CpuChipIcon className="h-6 w-6 text-purple-600 mr-3" />
             Our Approach
           </h2>
           
@@ -566,11 +565,11 @@ function About() {
             {modelApproach.map((approach, index) => (
               <div key={index} className="flex items-start">
                 <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-blue-600 font-bold text-lg">{approach.step}</span>
+                  <span className="text-blue-600 font-medium text-lg">{approach.step}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{approach.title}</h3>
-                  <p className="text-gray-700">{approach.description}</p>
+                  <h3 className="font-medium text-gray-800 mb-2">{approach.title}</h3>
+                  <p className="text-sm text-gray-500">{approach.description}</p>
                 </div>
               </div>
             ))}
@@ -578,27 +577,27 @@ function About() {
 
           {/* Model Architecture Diagram */}
           <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Model Architecture</h3>
+            <h3 className="font-medium text-gray-800 mb-4">Model Architecture</h3>
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8">
               <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
                 <div className="bg-white rounded-lg p-4 shadow-md text-center">
-                  <div className="text-blue-600 font-semibold">Data Input</div>
-                  <div className="text-sm text-gray-500">CSV/Excel/JSON</div>
+                  <div className="text-blue-600 font-medium">Data Input</div>
+                  <div className="text-xs text-gray-500">CSV/Excel/JSON</div>
                 </div>
                 <ArrowRightIcon className="h-6 w-6 text-gray-400" />
                 <div className="bg-white rounded-lg p-4 shadow-md text-center">
-                  <div className="text-green-600 font-semibold">Preprocessing</div>
-                  <div className="text-sm text-gray-500">Feature Engineering</div>
+                  <div className="text-green-600 font-medium">Preprocessing</div>
+                  <div className="text-xs text-gray-500">Feature Engineering</div>
                 </div>
                 <ArrowRightIcon className="h-6 w-6 text-gray-400" />
                 <div className="bg-white rounded-lg p-4 shadow-md text-center">
-                  <div className="text-purple-600 font-semibold">ML Ensemble</div>
-                  <div className="text-sm text-gray-500">XGBoost + RF + Decision Trees</div>
+                  <div className="text-purple-600 font-medium">ML Ensemble</div>
+                  <div className="text-xs text-gray-500">XGBoost + RF + Decision Trees</div>
                 </div>
                 <ArrowRightIcon className="h-6 w-6 text-gray-400" />
                 <div className="bg-white rounded-lg p-4 shadow-md text-center">
-                  <div className="text-red-600 font-semibold">Risk Output</div>
-                  <div className="text-sm text-gray-500">Probability Score</div>
+                  <div className="text-red-600 font-medium">Risk Output</div>
+                  <div className="text-xs text-gray-500">Probability Score</div>
                 </div>
               </div>
             </div>
@@ -606,9 +605,9 @@ function About() {
         </div>
 
         {/* Updated Model Performance Metrics Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-            <TrophyIcon className="h-8 w-8 text-orange-600 mr-3" />
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+            <TrophyIcon className="h-6 w-6 text-orange-600 mr-3" />
             Model Performance Results
           </h2>
           
@@ -616,9 +615,9 @@ function About() {
             {metrics.map((metric, index) => (
               <div key={index} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 text-center">
                 <div className="text-3xl font-bold text-blue-600 mb-2">{metric.value}</div>
-                <div className="text-lg font-semibold text-gray-900 mb-1">{metric.name}</div>
+                <div className="font-medium text-gray-800 mb-1">{metric.name}</div>
                 {metric.description && (
-                  <div className="text-sm text-gray-600">{metric.description}</div>
+                  <div className="text-xs text-gray-600">{metric.description}</div>
                 )}
               </div>
             ))}
@@ -626,9 +625,9 @@ function About() {
         </div>
 
         {/* Model Images Gallery Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8 relative">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-            <PhotoIcon className="h-8 w-8 text-indigo-600 mr-3" />
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6 relative">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+            <PhotoIcon className="h-6 w-6 text-indigo-600 mr-3" />
             Model Performance Visualizations
           </h2>
           
@@ -642,7 +641,7 @@ function About() {
                   className="w-full h-auto rounded-lg shadow-md cursor-pointer"
                   onClick={() => openPopup(image)}
                 />
-                <p className="text-center text-gray-600 mt-2 text-sm font-medium">
+                <p className="text-center text-gray-600 mt-2 text-xs font-medium">
                   {image.caption}
                 </p>
               </div>
@@ -659,7 +658,7 @@ function About() {
                   className="w-full h-auto rounded-lg shadow-md cursor-pointer"
                   onClick={() => openPopup(image)}
                 />
-                <p className="text-center text-gray-600 mt-2 text-sm font-medium">
+                <p className="text-center text-gray-600 mt-2 text-xs font-medium">
                   {image.caption}
                 </p>
               </div>
@@ -676,7 +675,7 @@ function About() {
                   className="w-full h-auto rounded-lg shadow-md cursor-pointer"
                   onClick={() => openPopup(image)}
                 />
-                <p className="text-center text-gray-600 mt-2 text-sm font-medium">
+                <p className="text-center text-gray-600 mt-2 text-xs font-medium">
                   {image.caption}
                 </p>
               </div>
@@ -688,7 +687,7 @@ function About() {
         <div className="text-center mt-12">
           <button
             onClick={handleTryRiskAnalyzer}
-            className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-8 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             Try RiskAnalyzer Now
             <ArrowRightIcon className="ml-2 h-5 w-5" />

@@ -346,7 +346,7 @@ function AppInner() {
             path="/analyze"
             element={
               <Layout userType={userType}>
-                <div className="max-w-5xl mx-auto">
+                <div className="mx-auto">
                   <div className="bg-white rounded-xl shadow p-6 mb-8">
                     {userType === "banker" ? (
                       <FileUpload

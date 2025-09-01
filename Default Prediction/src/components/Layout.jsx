@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 import { Link, useLocation, Navigate, useNavigate } from "react-router-dom";
 import Chatbot from "./Chatbot";
+// Import Material UI Icons
+import HomeIcon from "@mui/icons-material/Home";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import HistoryIcon from "@mui/icons-material/History";
+import InfoIcon from "@mui/icons-material/Info";
+import BusinessIcon from "@mui/icons-material/Business"; // For banker
+import PersonIcon from "@mui/icons-material/Person"; // For user
+import LogoutIcon from "@mui/icons-material/Logout";
+import MenuIcon from "@mui/icons-material/Menu";
 
 function Layout({ children }) {
-  const location = useLocation(); // This will track route changes
+  const location = useLocation();
   const navigate = useNavigate();
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isBouncing, setIsBouncing] = useState(false);
@@ -33,7 +42,7 @@ function Layout({ children }) {
     // Clear all localStorage items
     localStorage.removeItem("token");
     localStorage.removeItem("userType");
-    localStorage.removeItem("analysisHistory"); // Clear any cached analysis history
+    localStorage.removeItem("analysisHistory");
 
     // Dispatch auth change event to clear state in App component
     window.dispatchEvent(new Event("auth-change"));
@@ -74,7 +83,7 @@ function Layout({ children }) {
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-home mr-3 text-lg"></i>
+                <HomeIcon style={{ fontSize: 18, marginRight: "12px" }} />
                 Dashboard
               </Link>
 
@@ -86,7 +95,7 @@ function Layout({ children }) {
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-file-upload mr-3 text-lg"></i>
+                <UploadFileIcon style={{ fontSize: 18, marginRight: "12px" }} />
                 Analyze Data
               </Link>
 
@@ -98,7 +107,7 @@ function Layout({ children }) {
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-history mr-3 text-lg"></i>
+                <HistoryIcon style={{ fontSize: 18, marginRight: "12px" }} />
                 Analysis History
               </Link>
 
@@ -110,7 +119,7 @@ function Layout({ children }) {
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-info-circle mr-3 text-lg"></i>
+                <InfoIcon style={{ fontSize: 18, marginRight: "12px" }} />
                 About Us
               </Link>
             </nav>
@@ -120,11 +129,11 @@ function Layout({ children }) {
               {/* User Type Info */}
               <div className="flex items-center px-4 py-3 bg-blue-700 bg-opacity-50 rounded-lg">
                 <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mr-3 shadow-md">
-                  <i
-                    className={`fas ${
-                      isBanker ? "fa-user-tie" : "fa-user"
-                    } text-white text-sm`}
-                  ></i>
+                  {isBanker ? (
+                    <BusinessIcon style={{ fontSize: 16, color: "white" }} />
+                  ) : (
+                    <PersonIcon style={{ fontSize: 16, color: "white" }} />
+                  )}
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-blue-200 uppercase tracking-wider font-medium">
@@ -148,7 +157,7 @@ function Layout({ children }) {
                 onClick={handleLogout}
                 className="flex items-center w-full px-4 py-4 text-sm font-medium rounded-lg text-blue-200 hover:bg-red-600 hover:text-white transition-all duration-200 hover:shadow-md"
               >
-                <i className="fas fa-sign-out-alt mr-4 text-lg"></i>
+                <LogoutIcon style={{ fontSize: 18, marginRight: "16px" }} />
                 <span className="leading-none font-medium">Logout</span>
               </button>
             </div>
@@ -181,11 +190,11 @@ function Layout({ children }) {
           <div className="flex items-center gap-3">
             {/* Mobile user type indicator */}
             <div className="flex items-center px-3 py-1.5 bg-blue-700 rounded-lg shadow-md">
-              <i
-                className={`fas ${
-                  isBanker ? "fa-user-tie" : "fa-user"
-                } text-xs mr-2`}
-              ></i>
+              {isBanker ? (
+                <BusinessIcon style={{ fontSize: 12, marginRight: "8px" }} />
+              ) : (
+                <PersonIcon style={{ fontSize: 12, marginRight: "8px" }} />
+              )}
               <span className="text-xs font-semibold">
                 {isBanker ? "Banker" : "User"}
               </span>
@@ -196,10 +205,10 @@ function Layout({ children }) {
               className="p-2 rounded-lg text-blue-200 hover:text-white hover:bg-red-600 transition-all duration-200 hover:shadow-md"
               title="Logout"
             >
-              <i className="fas fa-sign-out-alt text-lg"></i>
+              <LogoutIcon style={{ fontSize: 18 }} />
             </button>
             <button className="p-2 rounded-lg text-blue-200 hover:text-white hover:bg-blue-700 transition-all duration-200">
-              <i className="fas fa-bars text-lg"></i>
+              <MenuIcon style={{ fontSize: 18 }} />
             </button>
           </div>
         </div>
@@ -213,7 +222,7 @@ function Layout({ children }) {
         {!isBanker && (
           <div className="fixed bottom-6 right-6 flex items-center gap-2">
             <button
-              className={`p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:shadow-xl ${
+              className={`p-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:shadow-xl ${
                 isBouncing ? "animate-bounce" : ""
               }`}
               onClick={handleChatbotToggle}
