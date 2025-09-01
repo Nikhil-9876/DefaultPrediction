@@ -9,7 +9,6 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
     loan_details,
   } = applicant;
 
-  console.log("demo for:", demographics.dependents);
   const badgeColor = (value) => {
     const lower = value?.toLowerCase();
     if (lower === "low" || lower === "approve") return "bg-green-100 text-green-700";

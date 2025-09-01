@@ -8,7 +8,6 @@ function ResultsDisplay({ data, filename, showNotification }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
 
-  console.log("ResultsDisplay received data:", data);
 
   // Helper function to calculate summary data from flat array
   const calculateSummaryData = () => {
@@ -317,7 +316,6 @@ function ResultsDisplay({ data, filename, showNotification }) {
   // Handle row click to expand/collapse ApplicantCard
   const handleRowClick = (applicantId, applicantIndex) => {
     const identifier = applicantId || applicantIndex;
-    console.log("Row clicked:", identifier, "Currently expanded:", expandedApplicant);
     
     if (expandedApplicant === identifier) {
       setExpandedApplicant(null); // Collapse if already expanded
@@ -340,8 +338,17 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      {summaryData && <SummaryCards summaryData={summaryData} />}
+      {/* Summary Cards - Pass the correct format */}
+      {summaryData && (
+        <SummaryCards 
+          data={{
+            Approve: summaryData.approvalSummary.Approve || 0,
+            Review: summaryData.approvalSummary.Review || 0,
+            Reject: summaryData.approvalSummary.Reject || 0,
+            Total: summaryData.totalApplicants
+          }} 
+        />
+      )}
 
       {/* Export and Filter Controls */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

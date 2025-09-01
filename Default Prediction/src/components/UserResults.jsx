@@ -3,37 +3,8 @@ import ApplicantCard from "./ApplicantCard";
 
 function UserResults({ data }) {
   // Function to convert raw data to ApplicantCard format
+  // Convert flat data structure to match ApplicantCard expected format
   const convertToApplicantCardFormat = (applicant) => {
-    // Determine recommendation based on risk category
-    let recommendation = "Review";
-    if (applicant.risk_category === "Low Risk") recommendation = "Approve";
-    if (applicant.risk_category === "High Risk" || applicant.risk_category === "Very High Risk") 
-      recommendation = "Reject";
-
-    // Calculate loan details
-    const monthlyIncome = applicant.monthly_income_inr || 0;
-    const minLoan = Math.round(monthlyIncome * 6);
-    const maxLoan = Math.round(monthlyIncome * 60);
-    
-    // Determine tenure and interest rates based on risk
-    let tenureMonths = 36;
-    let minInterest = 12.5;
-    let maxInterest = 16.0;
-    
-    if (applicant.risk_category === "Low Risk") {
-      tenureMonths = 60;
-      minInterest = 8.5;
-      maxInterest = 12.0;
-    } else if (applicant.risk_category === "High Risk" || applicant.risk_category === "Very High Risk") {
-      tenureMonths = 24;
-      minInterest = 18.0;
-      maxInterest = 24.0;
-    }
-    
-    // Calculate EMI (simplified calculation)
-    const loanAmount = applicant.loan_amount_applied_inr || monthlyIncome * 12;
-    const monthlyEmi = Math.round(loanAmount / tenureMonths);
-
     return {
       applicant_id: applicant.applicant_id || "N/A",
       demographics: {
@@ -41,71 +12,83 @@ function UserResults({ data }) {
         gender: applicant.gender || "N/A",
         education: applicant.education_level || "N/A",
         employment: applicant.employment_type || "N/A",
-        monthly_income: monthlyIncome,
+        monthly_income: applicant.monthly_income_inr,
         location: applicant.city || applicant.location_type || "N/A",
         marital_status: applicant.marital_status || "N/A",
-        dependents: applicant.number_of_dependents || "N/A"
+        dependents: applicant.number_of_dependents,
       },
       risk_assessment: {
-        overall_risk: applicant.risk_category || "Unknown",
-        default_probability: applicant.probability_of_default || 0,
-        recommendation: recommendation,
-        confidence_score: 0.85 // Default value
+        overall_risk: applicant.risk_category,
+        default_probability: applicant.probability_of_default,
+        recommendation: applicant.risk_category === "Low Risk" ? "Approve" : 
+                      applicant.risk_category === "Medium Risk" ? "Review" : "Reject",
+        confidence_score: 0.85 // Default confidence score since it's not in our data
       },
       top_decision_metrics: [
         {
           name: "Repayment Ability",
-          value: applicant.repayment_ability_score || 0,
+          value: applicant.repayment_ability_score,
           impact: "High",
-          status: (applicant.repayment_ability_score || 0) >= 70 ? "Good" : 
-                 (applicant.repayment_ability_score || 0) >= 50 ? "Fair" : "Poor",
+          status: applicant.repayment_ability_score >= 70 ? "Good" : 
+                 applicant.repayment_ability_score >= 50 ? "Fair" : "Poor",
           description: "Score indicating ability to repay loans"
         },
         {
           name: "Payment Timeliness",
-          value: applicant.timeliness_score || 0,
+          value: applicant.timeliness_score,
           impact: "High",
-          status: (applicant.timeliness_score || 0) >= 70 ? "Good" : 
-                 (applicant.timeliness_score || 0) >= 50 ? "Fair" : "Poor",
+          status: applicant.timeliness_score >= 70 ? "Good" : 
+                 applicant.timeliness_score >= 50 ? "Fair" : "Poor",
           description: "Historical payment timeliness pattern"
         },
         {
           name: "Financial Health",
-          value: applicant.financial_health_score || 0,
+          value: applicant.financial_health_score,
           impact: "Medium",
-          status: (applicant.financial_health_score || 0) >= 70 ? "Good" : 
-                 (applicant.financial_health_score || 0) >= 50 ? "Fair" : "Poor",
+          status: applicant.financial_health_score >= 70 ? "Good" : 
+                 applicant.financial_health_score >= 50 ? "Fair" : "Poor",
           description: "Overall financial stability indicator"
         },
         {
           name: "Stability Index",
-          value: applicant.stability_index || 0,
+          value: applicant.stability_index,
           impact: "Medium",
-          status: (applicant.stability_index || 0) >= 70 ? "Good" : 
-                 (applicant.stability_index || 0) >= 50 ? "Fair" : "Poor",
+          status: applicant.stability_index >= 70 ? "Good" : 
+                 applicant.stability_index >= 50 ? "Fair" : "Poor",
           description: "Employment and income stability measure"
         }
       ],
       loan_details: {
+        loan_applied: applicant.loan_amount_applied_inr,
+        loan_type: applicant.loan_type || "Personal Loan",
+        interest_rate: applicant.interest_rate,
+        application_date: applicant.application_date,
+        outstanding_amount: applicant.outstanding_loan_amount_inr,
+        property_value: applicant.property_value_inr,
+        dscr: applicant.debt_service_coverage,
+        income_expense_ratio: applicant.income_to_expense_ratio,
+        utilization_ratio: applicant.loan_utilization_ratio,
         eligibility: applicant.risk_category === "Low Risk" ? "Eligible" : 
-                    applicant.risk_category === "Medium Risk" ? "Review Required" : "Not Eligible",
+                   applicant.risk_category === "Medium Risk" ? "Review Required" : "Not Eligible",
         loan_range: {
-          minimum: minLoan,
-          maximum: maxLoan
+          minimum: Math.round((applicant.monthly_income_inr || 0) * 6),
+          maximum: Math.round((applicant.monthly_income_inr || 0) * 60)
         },
         terms: {
-          tenure_months: tenureMonths,
-          monthly_emi: monthlyEmi,
+          tenure_months: applicant.risk_category === "Low Risk" ? 60 : 
+                       applicant.risk_category === "Medium Risk" ? 36 : 24,
+          monthly_emi: Math.round((applicant.loan_amount_applied_inr || applicant.monthly_income_inr * 12) / 36),
           interest_rate_range: {
-            min: minInterest,
-            max: maxInterest
+            min: applicant.risk_category === "Low Risk" ? 8.5 : 
+                applicant.risk_category === "Medium Risk" ? 12.5 : 18.0,
+            max: applicant.risk_category === "Low Risk" ? 12.0 : 
+                applicant.risk_category === "Medium Risk" ? 16.0 : 24.0
           }
-        },
-        purpose: applicant.loan_purpose || "Personal Loan"
+        }
       }
     };
   };
-
+  
   if (!data || !Array.isArray(data) || data.length === 0) {
     return (
       <div className="text-center text-gray-500 mt-8 p-6 bg-white rounded-lg shadow">

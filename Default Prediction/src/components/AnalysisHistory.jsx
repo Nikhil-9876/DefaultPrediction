@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
-import ResultsModal from './../assets/modal/ResultsModal';
+import React, { useState } from "react";
+import ResultsModal from "./../assets/modal/ResultsModal";
 
-function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAnalysis, userType = "banker" }) {
+function AnalysisHistory({
+  history,
+  onLoadAnalysis,
+  showNotification,
+  onDeleteAnalysis,
+  userType = "banker",
+}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
 
@@ -9,13 +15,13 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
     if (event) {
       event.stopPropagation();
     }
-    
+
     setSelectedAnalysis(analysis);
-    
+
     if (onLoadAnalysis) {
       onLoadAnalysis(analysis);
     }
-    
+
     setTimeout(() => {
       setModalOpen(true);
     }, 100);
@@ -30,8 +36,12 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
 
   const handleDelete = (analysis, event) => {
     event.stopPropagation();
-    
-    if (window.confirm('Are you sure you want to delete this analysis? This action cannot be undone.')) {
+
+    if (
+      window.confirm(
+        "Are you sure you want to delete this analysis? This action cannot be undone."
+      )
+    ) {
       if (onDeleteAnalysis) {
         onDeleteAnalysis(analysis);
       }
@@ -49,12 +59,15 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
 
     analysis.jsonData.forEach((applicant) => {
       const riskCategory = applicant.risk_category;
-      
-      if (riskCategory === 'Low Risk') {
+
+      if (riskCategory === "Low Risk") {
         lowCount++;
-      } else if (riskCategory === 'Medium Risk') {
+      } else if (riskCategory === "Medium Risk") {
         mediumCount++;
-      } else if (riskCategory === 'High Risk' || riskCategory === 'Very High Risk') {
+      } else if (
+        riskCategory === "High Risk" ||
+        riskCategory === "Very High Risk"
+      ) {
         highCount++;
       } else {
         mediumCount++;
@@ -65,16 +78,26 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
       Low: lowCount,
       Medium: mediumCount,
       High: highCount,
-      total: analysis.jsonData.length
+      total: analysis.jsonData.length,
     };
   };
 
   const getAnalysisFilename = (analysis, index) => {
-    return analysis.fileName || analysis.filename || analysis.name || `Analysis ${index + 1}`;
+    return (
+      analysis.fileName ||
+      analysis.filename ||
+      analysis.name ||
+      `Analysis ${index + 1}`
+    );
   };
 
   const getAnalysisTimestamp = (analysis) => {
-    return analysis.dateTime || analysis.timestamp || analysis.createdAt || analysis.date;
+    return (
+      analysis.dateTime ||
+      analysis.timestamp ||
+      analysis.createdAt ||
+      analysis.date
+    );
   };
 
   const getAnalysisSummary = (analysis) => {
@@ -83,7 +106,7 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
         totalApplicants: 0,
         avgRiskScore: 0,
         avgDefaultProb: 0,
-        cities: []
+        cities: [],
       };
     }
 
@@ -92,7 +115,7 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
     let totalDefaultProb = 0;
     const cities = new Set();
 
-    analysis.jsonData.forEach(applicant => {
+    analysis.jsonData.forEach((applicant) => {
       totalRiskScore += applicant.risk_score || 0;
       totalDefaultProb += applicant.probability_of_default || 0;
       if (applicant.city) {
@@ -102,39 +125,49 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
 
     return {
       totalApplicants,
-      avgRiskScore: totalApplicants > 0 ? (totalRiskScore / totalApplicants).toFixed(1) : 0,
-      avgDefaultProb: totalApplicants > 0 ? ((totalDefaultProb / totalApplicants) * 100).toFixed(1) : 0,
-      cities: Array.from(cities).slice(0, 3)
+      avgRiskScore:
+        totalApplicants > 0 ? (totalRiskScore / totalApplicants).toFixed(1) : 0,
+      avgDefaultProb:
+        totalApplicants > 0
+          ? ((totalDefaultProb / totalApplicants) * 100).toFixed(1)
+          : 0,
+      cities: Array.from(cities).slice(0, 3),
     };
   };
 
   const getUserAnalysisData = (analysis) => {
-    if (!analysis?.jsonData || !Array.isArray(analysis.jsonData) || analysis.jsonData.length === 0) {
+    if (
+      !analysis?.jsonData ||
+      !Array.isArray(analysis.jsonData) ||
+      analysis.jsonData.length === 0
+    ) {
       return null;
     }
-    
+
     // For users, typically there should be only one record per analysis
     const userData = analysis.jsonData[0];
     return userData;
   };
 
   const formatCurrency = (amount) => {
-    if (!amount || amount === 0) return 'N/A';
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
+    if (!amount || amount === 0) return "N/A";
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
   return (
     <>
       <div className="space-y-6">
-        {/* Header - Removed the "X analyses stored" text */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
             {userType === "user" ? "My Analysis History" : "Analysis History"}
           </h1>
+          <div className="text-sm text-gray-500">
+            {Array.isArray(history) ? history.length : 0} analyses stored
+          </div>
         </div>
 
         {!Array.isArray(history) || history.length === 0 ? (
@@ -142,10 +175,12 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
             <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <i className="fas fa-history text-3xl text-gray-400"></i>
             </div>
-            <h3 className="text-lg font-medium text-gray-800 mb-2">No Analysis History</h3>
+            <h3 className="text-lg font-medium text-gray-800 mb-2">
+              No Analysis History
+            </h3>
             <p className="text-gray-500">
-              {userType === "user" 
-                ? "Complete your credit assessment to see results here" 
+              {userType === "user"
+                ? "Complete your credit assessment to see results here"
                 : "Perform analyses to see them appear here"}
             </p>
           </div>
@@ -215,10 +250,10 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                   const timestamp = getAnalysisTimestamp(analysis);
                   const id = analysis._id || analysis.id || `analysis-${index}`;
                   const userData = getUserAnalysisData(analysis);
-                  
+
                   return (
-                    <tr 
-                      key={id} 
+                    <tr
+                      key={id}
                       className="hover:bg-gray-50 transition cursor-pointer"
                       onClick={(e) => handleRowClick(analysis, e)}
                     >
@@ -227,18 +262,22 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                         <>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="font-medium text-blue-600">
-                              {userData?.applicant_id || 'YOUR_APPLICATION'}
+                              {userData?.applicant_id || "YOUR_APPLICATION"}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {userData?.city || 'Unknown City'}
+                              {userData?.city || "Unknown City"}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {timestamp ? new Date(timestamp).toLocaleDateString() : 'N/A'}
+                              {timestamp
+                                ? new Date(timestamp).toLocaleDateString()
+                                : "N/A"}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {timestamp ? new Date(timestamp).toLocaleTimeString() : ''}
+                              {timestamp
+                                ? new Date(timestamp).toLocaleTimeString()
+                                : ""}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -259,18 +298,21 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                   : "bg-red-100 text-red-800"
                               }`}
                             >
-                              {userData?.risk_category || 'Unknown'}
+                              {userData?.risk_category || "Unknown"}
                             </span>
                             <div className="text-xs text-gray-500 mt-1">
-                              {userData?.probability_of_default ? 
-                                `${(userData.probability_of_default * 100).toFixed(1)}% default risk` : 
-                                'No data'
-                              }
+                              {userData?.probability_of_default
+                                ? `${(
+                                    userData.probability_of_default * 100
+                                  ).toFixed(1)}% default risk`
+                                : "No data"}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <div className="font-medium text-gray-900">
-                              {userData?.risk_score ? userData.risk_score.toFixed(1) : 'N/A'}
+                              {userData?.risk_score
+                                ? userData.risk_score.toFixed(1)
+                                : "N/A"}
                             </div>
                             <div className="text-xs text-gray-500">
                               out of 100
@@ -286,9 +328,24 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 className="inline-flex items-center gap-1 px-3 py-1 rounded-md border border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 text-xs"
                                 title="View details"
                               >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                  />
                                 </svg>
                                 <span>View Report</span>
                               </button>
@@ -298,8 +355,18 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 title="Delete analysis"
                                 aria-label="Delete analysis"
                               >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                                 <span>Delete</span>
                               </button>
@@ -310,27 +377,41 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                         // Banker table row - full view
                         <>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="font-medium text-blue-600 truncate max-w-xs" title={filename}>
+                            <div
+                              className="font-medium text-blue-600 truncate max-w-xs"
+                              title={filename}
+                            >
                               {filename}
                             </div>
                             {summary.cities.length > 0 && (
                               <div className="text-xs text-gray-500 mt-1">
-                                {summary.cities.join(', ')}
-                                {summary.cities.length === 3 && analysis.jsonData && analysis.jsonData.length > 3 && '...'}
+                                {summary.cities.join(", ")}
+                                {summary.cities.length === 3 &&
+                                  analysis.jsonData &&
+                                  analysis.jsonData.length > 3 &&
+                                  "..."}
                               </div>
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {timestamp ? new Date(timestamp).toLocaleDateString() : 'N/A'}
+                              {timestamp
+                                ? new Date(timestamp).toLocaleDateString()
+                                : "N/A"}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {timestamp ? new Date(timestamp).toLocaleTimeString() : ''}
+                              {timestamp
+                                ? new Date(timestamp).toLocaleTimeString()
+                                : ""}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <div className="font-medium text-gray-900">{stats.total}</div>
-                            <div className="text-xs text-gray-500">applicants</div>
+                            <div className="font-medium text-gray-900">
+                              {stats.total}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              applicants
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <div className="flex flex-col items-center">
@@ -338,7 +419,10 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 {stats.Low}
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
-                                {stats.total > 0 ? Math.round((stats.Low / stats.total) * 100) : 0}%
+                                {stats.total > 0
+                                  ? Math.round((stats.Low / stats.total) * 100)
+                                  : 0}
+                                %
                               </div>
                             </div>
                           </td>
@@ -348,7 +432,12 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 {stats.Medium}
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
-                                {stats.total > 0 ? Math.round((stats.Medium / stats.total) * 100) : 0}%
+                                {stats.total > 0
+                                  ? Math.round(
+                                      (stats.Medium / stats.total) * 100
+                                    )
+                                  : 0}
+                                %
                               </div>
                             </div>
                           </td>
@@ -358,7 +447,10 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 {stats.High}
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
-                                {stats.total > 0 ? Math.round((stats.High / stats.total) * 100) : 0}%
+                                {stats.total > 0
+                                  ? Math.round((stats.High / stats.total) * 100)
+                                  : 0}
+                                %
                               </div>
                               <div className="text-xs text-gray-400 mt-1">
                                 (High + Very High)
@@ -366,7 +458,9 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <div className="font-medium text-gray-900">{summary.avgRiskScore}</div>
+                            <div className="font-medium text-gray-900">
+                              {summary.avgRiskScore}
+                            </div>
                             <div className="text-xs text-gray-500">
                               {summary.avgDefaultProb}% default prob
                             </div>
@@ -381,10 +475,26 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 className="inline-flex items-center gap-1 px-3 py-1 rounded-md border border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 text-xs"
                                 title="View details"
                               >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 0 1 6 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                  />
                                 </svg>
+
                                 <span>View</span>
                               </button>
                               <button
@@ -393,8 +503,18 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 title="Delete analysis"
                                 aria-label="Delete analysis"
                               >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2}
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                                 <span>Delete</span>
                               </button>
@@ -410,7 +530,54 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
           </div>
         )}
 
-        {/* Removed the blue information box that was at the bottom */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <span className="text-blue-400">ℹ️</span>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">
+                {userType === "user"
+                  ? "Personal Analysis Summary"
+                  : "Analysis Summary"}
+              </h3>
+              <div className="mt-2 text-sm text-blue-700">
+                {userType === "user" ? (
+                  <>
+                    <p>
+                      • Click on any row to view your detailed credit analysis
+                      report
+                    </p>
+                    <p>
+                      • Risk categories: Low Risk (Good), Medium Risk (Review),
+                      High Risk (Needs Improvement)
+                    </p>
+                    <p>
+                      • Your risk score and monthly income help determine your
+                      creditworthiness
+                    </p>
+                    <p>
+                      • Higher income and lower risk scores generally indicate
+                      better loan terms
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>• Click on any row to view detailed analysis results</p>
+                    <p>
+                      • Risk categories: Low Risk (Green), Medium Risk (Yellow),
+                      High Risk (Red - combines High & Very High)
+                    </p>
+                    <p>
+                      • Average risk score and default probability shown for
+                      quick comparison
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {selectedAnalysis && (
