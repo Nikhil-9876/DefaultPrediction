@@ -18,7 +18,7 @@ import Login from "./components/Authentication/Login/Login";
 import LoadingOverlay from "./components/LoadingOverlay";
 import About from "./components/About";
 import "./App.css";
-import ProtectedRoutes from "./routes/protectedRoutes";
+import ProtectedRoutes from "./routes/ProtectedRoutes";
 import ResultsModal from "./assets/modal/ResultsModal";
 
 function AppInner() {
