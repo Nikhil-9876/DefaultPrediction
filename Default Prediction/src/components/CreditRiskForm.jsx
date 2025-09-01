@@ -642,9 +642,6 @@ function CreditRiskForm({ onProcess, isLoading }) {
     </div>
   );
 
-  // Continue with other render methods using the same design patterns...
-  // (I'll show abbreviated versions for space, but follow the same pattern)
-
   const renderFinancialInfo = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -664,20 +661,461 @@ function CreditRiskForm({ onProcess, isLoading }) {
               errors.monthly_income_inr ? "border-red-500" : "border-gray-300"
             }`}
             required
+            aria-describedby={
+              errors.monthly_income_inr ? "income-error" : undefined
+            }
           />
           {errors.monthly_income_inr && (
-            <p className="text-red-500 text-sm mt-1 flex items-center">
+            <p id="income-error" className="text-red-500 text-sm mt-1 flex items-center">
               <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
               {errors.monthly_income_inr}
             </p>
           )}
         </div>
-        {/* Continue with other financial fields... */}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Spouse Income (INR)
+          </label>
+          <input
+            type="number"
+            name="spouse_income_inr"
+            value={formData.spouse_income_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Monthly Expenses (INR) *
+          </label>
+          <input
+            type="number"
+            name="monthly_expenses_inr"
+            value={formData.monthly_expenses_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.monthly_expenses_inr ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.monthly_expenses_inr ? "expenses-error" : undefined
+            }
+          />
+          {errors.monthly_expenses_inr && (
+            <p id="expenses-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.monthly_expenses_inr}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Loan Amount Applied (INR) *
+          </label>
+          <input
+            type="number"
+            name="loan_amount_applied_inr"
+            value={formData.loan_amount_applied_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="1000"
+            step="1000"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.loan_amount_applied_inr
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.loan_amount_applied_inr ? "loan-amount-error" : undefined
+            }
+          />
+          {errors.loan_amount_applied_inr && (
+            <p id="loan-amount-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.loan_amount_applied_inr}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Monthly Savings (INR)
+          </label>
+          <input
+            type="number"
+            name="monthly_savings_inr"
+            value={formData.monthly_savings_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Monthly Utility Bills (INR)
+          </label>
+          <input
+            type="number"
+            name="monthly_utility_bills_inr"
+            value={formData.monthly_utility_bills_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Property Value (INR)
+          </label>
+          <input
+            type="number"
+            name="property_value_inr"
+            value={formData.property_value_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Vehicle Value (INR)
+          </label>
+          <input
+            type="number"
+            name="vehicle_value_inr"
+            value={formData.vehicle_value_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Total Investments (INR)
+          </label>
+          <input
+            type="number"
+            name="total_investments_inr"
+            value={formData.total_investments_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Outstanding Loan Amount (INR)
+          </label>
+          <input
+            type="number"
+            name="outstanding_loan_amount_inr"
+            value={formData.outstanding_loan_amount_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Monthly Business Revenue (INR)
+          </label>
+          <input
+            type="number"
+            name="monthly_business_revenue_inr"
+            value={formData.monthly_business_revenue_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            placeholder="Leave blank if not applicable"
+          />
+        </div>
       </div>
     </div>
   );
 
-  // Similar patterns for other render methods...
+  const renderEmploymentBanking = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Years in Current Employment *
+          </label>
+          <input
+            type="number"
+            name="years_current_employment"
+            value={formData.years_current_employment}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="0.1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.years_current_employment
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.years_current_employment
+                ? "employment-years-error"
+                : undefined
+            }
+          />
+          {errors.years_current_employment && (
+            <p
+              id="employment-years-error"
+              className="text-red-500 text-sm mt-1 flex items-center"
+            >
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.years_current_employment}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Banking Relationship Years *
+          </label>
+          <input
+            type="number"
+            name="banking_relationship_years"
+            value={formData.banking_relationship_years}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="0.1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.banking_relationship_years
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.banking_relationship_years
+                ? "banking-years-error"
+                : undefined
+            }
+          />
+          {errors.banking_relationship_years && (
+            <p id="banking-years-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.banking_relationship_years}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDigitalBehavior = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Daily Mobile Usage Hours *
+          </label>
+          <input
+            type="number"
+            name="daily_mobile_hours"
+            value={formData.daily_mobile_hours}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            max="24"
+            step="0.5"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.daily_mobile_hours ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.daily_mobile_hours ? "mobile-hours-error" : undefined
+            }
+          />
+          {errors.daily_mobile_hours && (
+            <p id="mobile-hours-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.daily_mobile_hours}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Monthly Digital Transactions *
+          </label>
+          <input
+            type="number"
+            name="monthly_digital_transactions"
+            value={formData.monthly_digital_transactions}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.monthly_digital_transactions
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.monthly_digital_transactions
+                ? "digital-transactions-error"
+                : undefined
+            }
+          />
+          {errors.monthly_digital_transactions && (
+            <p
+              id="digital-transactions-error"
+              className="text-red-500 text-sm mt-1 flex items-center"
+            >
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.monthly_digital_transactions}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Average Transaction Amount (INR)
+          </label>
+          <input
+            type="number"
+            name="avg_transaction_amount_inr"
+            value={formData.avg_transaction_amount_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Social Media Accounts Count
+          </label>
+          <input
+            type="number"
+            name="social_media_accounts_count"
+            value={formData.social_media_accounts_count}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            max="50"
+            step="1"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRiskScores = () => (
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <p className="text-sm text-blue-800 flex items-center">
+          <InfoIcon style={{ fontSize: 16, marginRight: "8px" }} />
+          Please rate yourself on a scale of 0-100 for these digital behavior
+          aspects.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Mobile App Usage Intensity (0-100)
+          </label>
+          <input
+            type="number"
+            name="mobile_app_usage_intensity_score"
+            value={formData.mobile_app_usage_intensity_score}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            max="100"
+            step="1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.mobile_app_usage_intensity_score
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            aria-describedby={
+              errors.mobile_app_usage_intensity_score
+                ? "mobile-app-error"
+                : undefined
+            }
+          />
+          {errors.mobile_app_usage_intensity_score && (
+            <p id="mobile-app-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.mobile_app_usage_intensity_score}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Digital Payment Adoption (0-100)
+          </label>
+          <input
+            type="number"
+            name="digital_payment_adoption_score"
+            value={formData.digital_payment_adoption_score}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            max="100"
+            step="1"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+              errors.digital_payment_adoption_score
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            aria-describedby={
+              errors.digital_payment_adoption_score
+                ? "digital-payment-error"
+                : undefined
+            }
+          />
+          {errors.digital_payment_adoption_score && (
+            <p id="digital-payment-error" className="text-red-500 text-sm mt-1 flex items-center">
+              <InfoIcon style={{ fontSize: 16, marginRight: "4px" }} />
+              {errors.digital_payment_adoption_score}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   const renderCurrentStep = () => {
     switch (currentStep) {
