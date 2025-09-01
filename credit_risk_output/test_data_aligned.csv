@@ -1,0 +1,41 @@
+applicant_id,application_date,age,gender,education_level,employment_type,marital_status,family_size,number_of_dependents,location_type,monthly_income_inr,spouse_income_inr,monthly_expenses_inr,monthly_savings_inr,monthly_utility_bills_inr,property_value_inr,vehicle_value_inr,total_investments_inr,outstanding_loan_amount_inr,loan_amount_applied_inr,years_current_employment,banking_relationship_years,monthly_business_revenue_inr,daily_mobile_hours,monthly_digital_transactions,avg_transaction_amount_inr,social_media_accounts_count,mobile_app_usage_intensity_score,digital_payment_adoption_score,consent_status,city,loan_type,interest_rate
+F3145,2025-02-08,55,Female,Graduate,Salaried,Single,1,0,Tier2,120000,0,46227,73278,4472,7010108,718252,3834432,4604765,5000000,3.6,27.4,0,3.5,28,4485,1,29,23,Full Consent,Veraval,business loan,14.14
+D8257,2024-06-22,48,Male,Professional,Salaried,Married,2,0,Tier1,120000,70817,30579,87527,5758,4864367,615605,2299310,2302453,8000000,20.1,15.3,0,7.0,30,2371,2,47,74,Full Consent,Surendranagar,home loan,10.72
+C7457,2024-09-20,32,Male,Post Graduate,Professional,Single,1,0,Tier2,131884,0,32441,97188,1304,0,0,0,5539128,8000000,0.5,16.0,0,7.5,42,5680,4,76,68,Full Consent,Bharuch,home loan,10.41
+E3114,2025-05-19,44,Female,Post Graduate,Professional,Married,3,1,Metro,164007,0,54289,108499,22789,4189587,416565,3464256,3906825,8000000,26.0,28.0,0,3.9,37,3933,4,41,58,Full Consent,Ahmedabad,home loan,9.21
+F3217,2024-06-23,32,Male,Post Graduate,Salaried,Single,1,0,Tier1,138047,0,43962,91080,4852,0,164531,715901,2435738,8000000,14.0,16.0,0,8.9,52,2968,4,86,76,Full Consent,Bhavnagar,home loan,10.22
+A7205,2025-05-15,45,Female,Post Graduate,Business Owner,Single,1,0,Tier2,137712,0,49905,84797,5422,3314585,286380,1591706,991384,2000000,2.0,16.3,238248,4.8,28,4307,2,41,71,Full Consent,Anand,personal loan,17.55
+E1141,2024-09-10,32,Male,Professional,Professional,Single,1,0,Metro,120000,0,48034,71866,4722,0,456055,0,3997961,5000000,14.0,16.0,0,7.3,67,3376,3,66,80,Full Consent,Gandhinagar,business loan,14.5
+A4160,2024-09-05,34,Male,Graduate,Professional,Married,2,0,Tier1,120000,30522,47632,69457,6682,2951965,192640,1254876,5040000,8000000,16.0,3.9,0,8.7,57,4265,3,68,76,Full Consent,Jamnagar,home loan,9.78
+B5097,2025-04-21,31,Male,Graduate,Salaried,Married,2,0,Tier2,76545,35120,43057,32859,8921,859700,258218,379993,1276682,1500000,13.0,15.0,0,5.7,56,3072,5,82,74,Full Consent,Bharuch,auto loan,11.32
+A2357,2025-01-12,36,Female,Post Graduate,Salaried,Married,3,1,Tier2,60000,12373,35788,22354,16728,0,0,167855,2520000,5760000,18.0,1.1,0,6.0,32,4037,2,40,48,Full Consent,Navsari,home loan,10.12
+F6627,2025-05-07,50,Male,Diploma,Professional,Married,2,0,Tier2,60000,20434,26351,32833,7949,757775,163753,0,2010146,3091905,17.5,25.5,0,1.7,9,5656,2,18,43,Full Consent,Mehsana,home loan,10.13
+A7994,2024-08-23,50,Male,Post Graduate,Salaried,Married,3,1,Tier2,72576,0,31292,41222,13383,1673014,119330,0,3048192,5000000,20.7,33.6,0,4.3,19,7341,2,22,35,Full Consent,Godhra,business loan,15.07
+E5540,2025-05-17,50,Male,Graduate,Salaried,Single,1,0,Metro,60000,0,35618,21139,2444,0,0,316265,2520000,5760000,30.0,32.8,0,1.2,12,13029,1,32,42,Full Consent,Surat,home loan,10.58
+B6725,2025-01-25,38,Male,Post Graduate,Salaried,Married,3,1,Metro,62956,11713,25221,36732,5475,0,0,0,1040561,2000000,20.0,22.0,0,3.4,33,3348,2,41,54,Full Consent,Vadodara,personal loan,18.63
+B5381,2025-05-26,28,Male,Graduate,Salaried,Married,2,0,Metro,75312,0,32013,41563,5781,0,0,544899,1038848,1197609,1.4,12.0,0,9.2,49,1445,3,60,83,Full Consent,Vadodara,auto loan,11.42
+D4650,2025-03-21,47,Female,Graduate,Salaried,Married,4,2,Metro,60000,12677,27160,29650,8218,0,71787,0,2520000,5428159,29.0,0.5,0,7.1,36,4072,2,53,66,Full Consent,Ahmedabad,home loan,9.92
+F8223,2024-10-26,28,Female,Diploma,Salaried,Married,4,2,Metro,85326,63376,58124,24474,35792,0,313748,0,103248,185069,10.0,12.0,0,3.8,35,2434,2,42,46,Full Consent,Surat,personal loan,18.14
+D4782,2024-10-19,50,Male,Graduate,Salaried,Married,2,0,Tier2,83222,44100,29755,50931,10456,0,0,0,517035,678476,23.9,0.5,0,1.1,25,4991,1,17,22,Full Consent,Bharuch,gold loan,12.39
+E9597,2024-08-26,24,Female,Graduate,Salaried,Single,1,0,Tier2,45000,0,28789,14942,3174,0,0,0,191370,765480,6.0,8.0,0,7.0,61,1522,3,89,75,Full Consent,Navsari,education loan,12.16
+B4981,2024-07-03,32,Female,Graduate,Professional,Married,2,0,Metro,49023,24829,19684,26407,897,0,0,297107,2058966,3529656,14.0,16.0,0,7.4,71,1095,6,66,78,Full Consent,Gandhinagar,business loan,14.58
+C7121,2024-11-30,32,Male,Graduate,Salaried,Married,3,1,Tier2,53298,25475,38534,14163,9158,0,0,0,833026,1309135,14.0,16.0,0,8.0,48,1653,6,77,82,Full Consent,Anand,education loan,12.6
+C6809,2025-06-23,22,Male,Graduate,Salaried,Single,1,0,Tier2,57725,0,37689,18626,1517,621206,90544,394221,56801,133189,0.5,6.0,0,6.7,55,1576,4,70,78,Full Consent,Patan,credit card,29.65
+A6397,2025-01-27,22,Female,Post Graduate,Salaried,Married,2,0,Metro,64810,26291,42642,21717,13143,831937,0,0,238063,865241,4.0,6.0,0,8.9,61,1657,5,87,68,Full Consent,Gandhinagar,education loan,12.07
+A7887,2024-06-04,27,Male,Post Graduate,Salaried,Single,1,0,Tier2,45000,0,31992,11014,3062,0,0,0,133941,180989,9.0,11.0,0,7.4,51,2610,3,60,75,Full Consent,Bharuch,credit card,30.22
+B3735,2024-10-12,22,Female,Graduate,Salaried,Married,2,0,Tier2,70952,47566,33497,35379,10026,0,217241,0,40950,163803,4.0,0.5,0,7.7,47,1585,3,63,72,Full Consent,Anand,personal loan,18.4
+E5255,2024-12-03,32,Female,Graduate,Professional,Single,1,0,Tier1,77314,0,58576,15754,4304,0,125677,158727,775614,1686203,1.9,16.0,0,7.4,69,2916,5,79,69,Full Consent,Jamnagar,education loan,12.44
+F4169,2025-02-21,48,Male,Diploma,Salaried,Married,2,0,Tier1,35196,18464,21477,13713,1084,0,0,68463,105474,209849,19.1,32.0,0,3.1,39,1007,4,46,69,Full Consent,Rajkot,personal loan,17.79
+E3142,2024-06-15,37,Male,Diploma,Salaried,Married,4,2,Tier1,47704,10017,30887,16685,17001,0,91087,0,2003568,3743512,19.0,21.0,0,5.5,40,2308,4,42,63,Full Consent,Bhavnagar,home loan,10.43
+C3786,2025-06-13,27,Female,High School,Self Employed,Single,1,0,Metro,35000,0,26176,6189,2372,0,0,0,153375,200000,8.3,11.0,60471,7.1,29,3793,3,48,47,Full Consent,Vadodara,auto loan,12.42
+B1995,2025-01-05,44,Female,Diploma,Salaried,Married,2,0,Tier1,88549,0,52285,33204,5569,0,0,292849,169787,418003,26.0,28.0,0,4.4,35,6766,2,40,42,Full Consent,Jamnagar,auto loan,11.43
+A4382,2025-01-24,48,Female,Diploma,Salaried,Married,4,2,Tier2,44591,14304,31888,12009,11489,0,0,0,1872822,4280736,10.9,32.0,0,2.5,24,5068,2,46,50,Full Consent,Porbandar,home loan,10.52
+F8597,2025-03-02,48,Male,Diploma,Salaried,Single,1,0,Tier2,62150,0,43464,17405,2888,0,57233,382189,481977,1419803,26.0,32.0,0,4.2,24,5332,4,64,59,Full Consent,Anand,personal loan,18.05
+A4941,2024-08-06,27,Male,Diploma,Salaried,Single,1,0,Metro,69863,0,46319,23104,3906,1147022,271417,465585,183841,480774,9.0,11.0,0,6.0,41,2973,2,66,54,Full Consent,Surat,personal loan,17.75
+A9028,2025-07-25,44,Male,Graduate,Self Employed,Married,3,1,Tier2,72897,16195,60988,10031,16465,0,0,312845,3061674,6998112,26.0,0.5,127209,5.3,33,2710,4,68,65,Full Consent,Godhra,home loan,10.17
+E9941,2024-12-20,28,Male,Diploma,Self Employed,Married,4,2,Tier1,37206,22987,30682,3733,11566,0,0,0,47285,189141,10.0,0.5,74235,3.0,19,4768,2,49,68,Full Consent,Jamnagar,personal loan,18.9
+E3504,2025-07-24,45,Male,Diploma,Salaried,Single,1,0,Metro,33642,0,30217,0,4775,0,47005,0,680374,1073170,26.8,29.0,0,4.6,28,3256,4,45,44,Full Consent,Gandhinagar,home loan,10.05
+C8197,2024-07-02,33,Female,High School,Self Employed,Married,3,1,Tier2,53930,37985,47691,4698,13109,0,60407,112135,691711,2560327,0.5,17.0,77002,4.5,26,3062,3,52,44,Full Consent,Mehsana,home loan,10.12
+E4027,2024-12-21,45,Male,Graduate,Self Employed,Married,4,2,Tier2,23591,0,18942,1675,2728,0,0,0,442637,500000,26.8,29.0,35769,6.1,19,2929,3,59,74,Full Consent,Junagadh,home loan,10.39
+A3710,2024-12-15,43,Male,High School,Self Employed,Married,3,1,Tier1,79898,0,74423,3509,14338,0,197974,0,3338822,7670208,24.2,0.5,148777,6.8,35,2466,4,68,45,Full Consent,Bhavnagar,home loan,10.33
+C9952,2024-10-15,33,Female,High School,Business Owner,Single,1,0,Tier2,81659,0,79386,0,6689,1293287,0,0,876892,1500000,15.0,17.0,202208,7.1,41,3726,4,43,48,Full Consent,Nadiad,auto loan,11.67
