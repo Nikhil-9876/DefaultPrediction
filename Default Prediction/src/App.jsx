@@ -41,7 +41,7 @@ function AppInner() {
         return;
       }
 
-      const response = await fetch("http://localhost:4000/results/GetResults", {
+      const response = await fetch("https://defaultprediction-backend-mongodb.onrender.com/results/GetResults", {
         method: "GET",
         headers: {
           "auth-token": `${token}`,
@@ -68,7 +68,7 @@ function AppInner() {
       const analysisId = analysis._id || analysis.id;
 
       const response = await fetch(
-        `http://localhost:4000/results/DeleteResult/${analysisId}`,
+        `https://defaultprediction-backend-mongodb.onrender.com/results/DeleteResult/${analysisId}`,
         {
           method: "DELETE",
           headers: {
@@ -139,7 +139,7 @@ function AppInner() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:4000/results/SaveResults",
+        "https://defaultprediction-backend-mongodb.onrender.com/results/SaveResults",
         {
           method: "POST",
           headers: {
@@ -181,7 +181,7 @@ function AppInner() {
       formData.append("file", file);
 
       const response = await fetch(
-        "http://127.0.0.1:5000/api/credit_risk/analyze",
+        "https://defaultprediction-backend.onrender.com/api/credit_risk/analyze",
         { method: "POST", body: formData }
       );
 
