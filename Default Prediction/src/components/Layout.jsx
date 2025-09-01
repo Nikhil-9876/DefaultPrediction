@@ -47,10 +47,20 @@ function Layout({ children }) {
       {/* Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
         <div className="flex flex-col w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white">
-          <div className="flex items-center ml-7 h-16 px-4 border-b border-blue-700">
-            <div className="flex items-left">
-              <i className="fas fa-chart-line text-2xl text-blue-300"></i>
-              <span className="text-xl font-semibold">RiskAnalyzer</span>
+          <div className="flex flex-row items-center px-6 py-4 h-30 border-b border-blue-700">
+            {/* Logo to the left */}
+            <div className="mr-4">
+              <img
+                src="images/RA.png"
+                alt="RiskAnalyzer Logo"
+                className="w-20 h-20 object-cover"
+              />
+            </div>
+            {/* Title to the right */}
+            <div className="text-left">
+              <span className="text-2xl font-bold tracking-tight">
+                RiskAnalyzer
+              </span>
             </div>
           </div>
 
@@ -58,49 +68,49 @@ function Layout({ children }) {
             <nav className="flex-1 space-y-2">
               <Link
                 to="/dashboard"
-                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                   location.pathname === "/dashboard"
-                    ? "bg-blue-700 text-white"
+                    ? "bg-blue-700 text-white shadow-md"
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-home mr-3"></i>
+                <i className="fas fa-home mr-3 text-lg"></i>
                 Dashboard
               </Link>
 
               <Link
                 to="/analyze"
-                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                   location.pathname === "/analyze"
-                    ? "bg-blue-700 text-white"
+                    ? "bg-blue-700 text-white shadow-md"
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-file-upload mr-3"></i>
+                <i className="fas fa-file-upload mr-3 text-lg"></i>
                 Analyze Data
               </Link>
 
               <Link
                 to="/history"
-                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                   location.pathname === "/history"
-                    ? "bg-blue-700 text-white"
+                    ? "bg-blue-700 text-white shadow-md"
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-history mr-3"></i>
+                <i className="fas fa-history mr-3 text-lg"></i>
                 Analysis History
               </Link>
-              
+
               <Link
                 to="/about"
-                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                   location.pathname === "/about"
-                    ? "bg-blue-700 text-white"
+                    ? "bg-blue-700 text-white shadow-md"
                     : "text-blue-200 hover:bg-blue-700 hover:text-white"
                 }`}
               >
-                <i className="fas fa-info-circle mr-3"></i>
+                <i className="fas fa-info-circle mr-3 text-lg"></i>
                 About Us
               </Link>
             </nav>
@@ -108,8 +118,8 @@ function Layout({ children }) {
             {/* User Info & Logout Section - Bottom Left */}
             <div className="mt-auto pt-4 space-y-3 border-t border-blue-700">
               {/* User Type Info */}
-              <div className="flex items-center px-4 py-2 bg-blue-700 bg-opacity-50 rounded-lg">
-                <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full mr-3">
+              <div className="flex items-center px-4 py-3 bg-blue-700 bg-opacity-50 rounded-lg">
+                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mr-3 shadow-md">
                   <i
                     className={`fas ${
                       isBanker ? "fa-user-tie" : "fa-user"
@@ -117,16 +127,16 @@ function Layout({ children }) {
                   ></i>
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-blue-200 uppercase tracking-wider">
+                  <p className="text-xs text-blue-200 uppercase tracking-wider font-medium">
                     {isBanker ? "Banker Account" : "User Account"}
                   </p>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-semibold text-white">
                     {isBanker ? "Banking Portal" : "Credit Analysis"}
                   </p>
                 </div>
                 <div className="flex items-center">
                   <div
-                    className={`w-2 h-2 rounded-full ${
+                    className={`w-3 h-3 rounded-full shadow-sm ${
                       isBanker ? "bg-green-400" : "bg-blue-400"
                     }`}
                   ></div>
@@ -136,10 +146,10 @@ function Layout({ children }) {
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-4 text-sm font-medium rounded-lg text-blue-200 hover:bg-red-600 hover:text-white transition-colors duration-200"
+                className="flex items-center w-full px-4 py-4 text-sm font-medium rounded-lg text-blue-200 hover:bg-red-600 hover:text-white transition-all duration-200 hover:shadow-md"
               >
-                <i className="fas fa-sign-out-alt mr-4"></i>
-                <span className="leading-none">Logout</span>
+                <i className="fas fa-sign-out-alt mr-4 text-lg"></i>
+                <span className="leading-none font-medium">Logout</span>
               </button>
             </div>
           </div>
@@ -149,33 +159,47 @@ function Layout({ children }) {
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-blue-800 text-white">
+        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-800 to-blue-900 text-white shadow-lg">
           <div className="flex items-center">
-            <i className="fas fa-chart-line text-xl text-blue-300 mr-2"></i>
-            <span className="text-lg font-semibold">RiskAnalyzer</span>
+            {/* Mobile Logo - increased size */}
+            <div className="mr-3">
+              <img
+                src="images/RA.png"
+                alt="RiskAnalyzer Logo"
+                className="w-12 h-12 object-cover"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-tight">
+                RiskAnalyzer
+              </span>
+              <span className="text-xs text-blue-300 font-medium">
+                Financial Intelligence
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Mobile user type indicator */}
-            <div className="flex items-center px-2 py-1 bg-blue-700 rounded-md">
+            <div className="flex items-center px-3 py-1.5 bg-blue-700 rounded-lg shadow-md">
               <i
                 className={`fas ${
                   isBanker ? "fa-user-tie" : "fa-user"
-                } text-xs mr-1`}
+                } text-xs mr-2`}
               ></i>
-              <span className="text-xs font-medium">
+              <span className="text-xs font-semibold">
                 {isBanker ? "Banker" : "User"}
               </span>
             </div>
             {/* Mobile logout button */}
             <button
               onClick={handleLogout}
-              className="p-2 rounded-md text-blue-200 hover:text-white hover:bg-red-600 transition-colors duration-200"
+              className="p-2 rounded-lg text-blue-200 hover:text-white hover:bg-red-600 transition-all duration-200 hover:shadow-md"
               title="Logout"
             >
-              <i className="fas fa-sign-out-alt"></i>
+              <i className="fas fa-sign-out-alt text-lg"></i>
             </button>
-            <button className="p-1 rounded-md text-blue-200 hover:text-white">
-              <i className="fas fa-bars"></i>
+            <button className="p-2 rounded-lg text-blue-200 hover:text-white hover:bg-blue-700 transition-all duration-200">
+              <i className="fas fa-bars text-lg"></i>
             </button>
           </div>
         </div>
@@ -189,7 +213,7 @@ function Layout({ children }) {
         {!isBanker && (
           <div className="fixed bottom-6 right-6 flex items-center gap-2">
             <button
-              className={`p-1 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+              className={`p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:shadow-xl ${
                 isBouncing ? "animate-bounce" : ""
               }`}
               onClick={handleChatbotToggle}
