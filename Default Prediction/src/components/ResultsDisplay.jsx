@@ -479,6 +479,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
                       </td>
                     </tr>
                     
+                    
                     {/* Expanded Row with ApplicantCard */}
                     {isExpanded && (
                       <tr>

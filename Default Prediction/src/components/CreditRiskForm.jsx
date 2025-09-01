@@ -1,58 +1,81 @@
 import React, { useState, useCallback, useRef } from "react";
 
 function CreditRiskForm({ onProcess, isLoading }) {
+  // City to location type mapping based on your image
+  const cityLocationMapping = {
+    // Metro cities
+    "Ahmedabad": "Metro",
+    "Surat": "Metro", 
+    "Vadodara": "Metro",
+    
+    // Tier1 cities
+    "Rajkot": "Tier1",
+    "Bhavnagar": "Tier1",
+    "Jamnagar": "Tier1",
+    "Gandhinagar": "Metro", // Updated to Metro as shown in image
+    "Surendranagar": "Tier1",
+    
+    // Tier2 cities
+    "Junagadh": "Tier2",
+    "Nadiad": "Tier2",
+    "Morbi": "Tier2",
+    "Anand": "Tier2",
+    "Mehsana": "Tier2",
+    "Navsari": "Tier2",
+    "Bharuch": "Tier2",
+    "Vapi": "Tier2",
+    "Valsad": "Tier2",
+    "Patan": "Tier2",
+    "Godhra": "Tier2",
+    "Porbandar": "Tier2",
+    "Palanpur": "Tier2",
+    "Veraval": "Tier2"
+  };
+
   const [formData, setFormData] = useState({
-    // Personal Information
-    applicant_id: '',
-    application_date: new Date().toISOString().split('T')[0],
-    age: '',
-    gender: '',
-    education_level: '',
-    employment_type: '',
-    marital_status: '',
-    family_size: '',
-    number_of_dependents: '0',
-    location_type: '',
-    
-    // Financial Information (in INR)
-    monthly_income_inr: '',
-    spouse_income_inr: '0',
-    monthly_expenses_inr: '',
-    monthly_savings_inr: '0',
-    monthly_utility_bills_inr: '0',
-    property_value_inr: '0',
-    vehicle_value_inr: '0',
-    total_investments_inr: '0',
-    outstanding_loan_amount_inr: '0',
-    
-    // Employment & Banking
-    years_current_employment: '',
-    banking_relationship_years: '',
-    monthly_business_revenue_inr: '0',
-    
-    // Digital Behavior
-    daily_mobile_hours: '',
-    monthly_digital_transactions: '',
-    avg_transaction_amount_inr: '0',
-    social_media_accounts_count: '0',
-    
-    // Scores (0-100) - default to reasonable values if empty
-    mobile_app_usage_intensity_score: '50',
-    digital_payment_adoption_score: '50',
-    utility_payment_regularity_score: '75',
-    location_stability_score: '75',
-    mobile_banking_usage_score: '50',
-    payment_reliability_score: '75',
-    financial_health_score: '60',
-    stability_index: '70',
-    timeliness_score: '75',
-    repayment_ability_score: '60',
-    
-    // Risk Assessment - will be calculated by model
-    probability_of_default: '0',
-    data_completeness_pct: '100',
-    consent_status: 'granted',
-    explainability_support_flag: '1'
+    // Personal Information (8 fields - removed location_type)
+    applicant_id: "",
+    application_date: new Date().toISOString().split("T")[0],
+    age: "",
+    gender: "",
+    education_level: "",
+    employment_type: "",
+    marital_status: "",
+    family_size: "",
+    number_of_dependents: "0",
+
+    // Location & Financial Information (12 fields - location_type auto-mapped)
+    city: "",
+    monthly_income_inr: "",
+    spouse_income_inr: "0",
+    monthly_expenses_inr: "",
+    monthly_savings_inr: "0",
+    monthly_utility_bills_inr: "0",
+    property_value_inr: "0",
+    vehicle_value_inr: "0",
+    total_investments_inr: "0",
+    outstanding_loan_amount_inr: "0",
+    loan_amount_applied_inr: "",
+    monthly_business_revenue_inr: "0",
+
+    // Employment & Banking (2 fields)
+    years_current_employment: "",
+    banking_relationship_years: "",
+
+    // Digital Behavior (4 fields)
+    daily_mobile_hours: "",
+    monthly_digital_transactions: "",
+    avg_transaction_amount_inr: "0",
+    social_media_accounts_count: "0",
+
+    // Risk Scores (2 fields only)
+    mobile_app_usage_intensity_score: "50",
+    digital_payment_adoption_score: "50",
+
+    // System Fields (3 fields)
+    data_completeness_pct: "100",
+    consent_status: "granted",
+    explainability_support_flag: "1",
   });
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -62,116 +85,167 @@ function CreditRiskForm({ onProcess, isLoading }) {
 
   const steps = [
     "Personal Information",
-    "Financial Details", 
+    "Financial Details",
     "Employment & Banking",
     "Digital Behavior",
-    "Risk Scores"
+    "Risk Scores",
   ];
 
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  }, [errors]);
+  const handleInputChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
 
-  const validateStep = useCallback((step) => {
-    const newErrors = {};
-    
-    switch(step) {
-      case 0:
-        if (!formData.age || parseInt(formData.age) < 18 || parseInt(formData.age) > 100) {
-          newErrors.age = 'Age must be between 18-100';
+      setFormData((prev) => {
+        const newData = {
+          ...prev,
+          [name]: value,
+        };
+
+        // Auto-set location_type when city is selected
+        if (name === "city" && value) {
+          newData.location_type = cityLocationMapping[value] || "Tier2";
         }
-        if (!formData.gender) newErrors.gender = 'Gender is required';
-        if (!formData.education_level) newErrors.education_level = 'Education level is required';
-        if (!formData.employment_type) newErrors.employment_type = 'Employment type is required';
-        if (!formData.marital_status) newErrors.marital_status = 'Marital status is required';
-        if (!formData.family_size || parseInt(formData.family_size) < 1) {
-          newErrors.family_size = 'Family size must be at least 1';
-        }
-        if (!formData.location_type) newErrors.location_type = 'Location type is required';
-        break;
-        
-      case 1:
-        if (!formData.monthly_income_inr || parseFloat(formData.monthly_income_inr) <= 0) {
-          newErrors.monthly_income_inr = 'Monthly income is required and must be greater than 0';
-        }
-        if (!formData.monthly_expenses_inr || parseFloat(formData.monthly_expenses_inr) < 0) {
-          newErrors.monthly_expenses_inr = 'Monthly expenses is required and cannot be negative';
-        }
-        break;
-        
-      case 2:
-        if (!formData.years_current_employment || parseFloat(formData.years_current_employment) < 0) {
-          newErrors.years_current_employment = 'Employment years is required and cannot be negative';
-        }
-        if (!formData.banking_relationship_years || parseFloat(formData.banking_relationship_years) < 0) {
-          newErrors.banking_relationship_years = 'Banking relationship years is required and cannot be negative';
-        }
-        break;
-        
-      case 3:
-        {
-          const mobileHours = parseFloat(formData.daily_mobile_hours);
-          if (!formData.daily_mobile_hours || mobileHours < 0 || mobileHours > 24) {
-            newErrors.daily_mobile_hours = 'Daily mobile hours must be between 0-24';
+
+        return newData;
+      });
+
+      if (errors[name]) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
+    },
+    [errors, cityLocationMapping]
+  );
+
+  const validateStep = useCallback(
+    (step) => {
+      const newErrors = {};
+
+      switch (step) {
+        case 0:
+          if (
+            !formData.age ||
+            parseInt(formData.age) < 18 ||
+            parseInt(formData.age) > 100
+          ) {
+            newErrors.age = "Age must be between 18-100";
           }
-          if (!formData.monthly_digital_transactions || parseInt(formData.monthly_digital_transactions) < 0) {
-            newErrors.monthly_digital_transactions = 'Monthly digital transactions is required and cannot be negative';
+          if (!formData.gender) newErrors.gender = "Gender is required";
+          if (!formData.education_level)
+            newErrors.education_level = "Education level is required";
+          if (!formData.employment_type)
+            newErrors.employment_type = "Employment type is required";
+          if (!formData.marital_status)
+            newErrors.marital_status = "Marital status is required";
+          if (!formData.family_size || parseInt(formData.family_size) < 1) {
+            newErrors.family_size = "Family size must be at least 1";
           }
-        }
-        break;
-        
-      case 4:
-        {
-          const scoreFields = [
-            'mobile_app_usage_intensity_score', 'digital_payment_adoption_score',
-            'utility_payment_regularity_score', 'location_stability_score',
-            'mobile_banking_usage_score', 'payment_reliability_score',
-            'financial_health_score', 'stability_index',
-            'timeliness_score', 'repayment_ability_score'
-          ];
-          
-          scoreFields.forEach(field => {
-            const value = parseInt(formData[field]);
-            if (isNaN(value) || value < 0 || value > 100) {
-              newErrors[field] = 'Score must be between 0-100';
+          if (!formData.city || formData.city.trim().length === 0) {
+            newErrors.city = "City is required";
+          }
+          break;
+
+        case 1:
+          if (
+            !formData.monthly_income_inr ||
+            parseFloat(formData.monthly_income_inr) <= 0
+          ) {
+            newErrors.monthly_income_inr =
+              "Monthly income is required and must be greater than 0";
+          }
+          if (
+            !formData.monthly_expenses_inr ||
+            parseFloat(formData.monthly_expenses_inr) < 0
+          ) {
+            newErrors.monthly_expenses_inr =
+              "Monthly expenses is required and cannot be negative";
+          }
+          if (
+            !formData.loan_amount_applied_inr ||
+            parseFloat(formData.loan_amount_applied_inr) <= 0
+          ) {
+            newErrors.loan_amount_applied_inr =
+              "Loan amount is required and must be greater than 0";
+          }
+          break;
+
+        case 2:
+          if (
+            !formData.years_current_employment ||
+            parseFloat(formData.years_current_employment) < 0
+          ) {
+            newErrors.years_current_employment =
+              "Employment years is required and cannot be negative";
+          }
+          if (
+            !formData.banking_relationship_years ||
+            parseFloat(formData.banking_relationship_years) < 0
+          ) {
+            newErrors.banking_relationship_years =
+              "Banking relationship years is required and cannot be negative";
+          }
+          break;
+
+        case 3:
+          {
+            const mobileHours = parseFloat(formData.daily_mobile_hours);
+            if (
+              !formData.daily_mobile_hours ||
+              mobileHours < 0 ||
+              mobileHours > 24
+            ) {
+              newErrors.daily_mobile_hours =
+                "Daily mobile hours must be between 0-24";
             }
-          });
-        }
-        break;
-        
-      default:
-        break;
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData]);
+            if (
+              !formData.monthly_digital_transactions ||
+              parseInt(formData.monthly_digital_transactions) < 0
+            ) {
+              newErrors.monthly_digital_transactions =
+                "Monthly digital transactions is required and cannot be negative";
+            }
+          }
+          break;
+
+        case 4:
+          {
+            const scoreFields = [
+              "mobile_app_usage_intensity_score",
+              "digital_payment_adoption_score",
+            ];
+
+            scoreFields.forEach((field) => {
+              const value = parseInt(formData[field]);
+              if (isNaN(value) || value < 0 || value > 100) {
+                newErrors[field] = "Score must be between 0-100";
+              }
+            });
+          }
+          break;
+
+        default:
+          break;
+      }
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [formData]
+  );
 
   const nextStep = useCallback(() => {
     if (validateStep(currentStep)) {
       const newStep = Math.min(currentStep + 1, steps.length - 1);
       setCurrentStep(newStep);
-      // Reset submit permission when moving to next step
       setCanSubmit(false);
     }
   }, [currentStep, validateStep, steps.length]);
 
   const prevStep = useCallback(() => {
-    setCurrentStep(prev => Math.max(prev - 1, 0));
-    // Reset submit permission when moving to previous step
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
     setCanSubmit(false);
   }, []);
 
@@ -184,86 +258,104 @@ function CreditRiskForm({ onProcess, isLoading }) {
   const convertToCSV = useCallback((data) => {
     const headers = Object.keys(data);
     const values = Object.values(data);
-    const escapedValues = values.map(value => {
+    const escapedValues = values.map((value) => {
       const stringValue = String(value);
-      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+      if (
+        stringValue.includes(",") ||
+        stringValue.includes('"') ||
+        stringValue.includes("\n")
+      ) {
         return `"${stringValue.replace(/"/g, '""')}"`;
       }
       return stringValue;
     });
-    return `${headers.join(',')}\n${escapedValues.join(',')}`;
+    return `${headers.join(",")}\n${escapedValues.join(",")}`;
   }, []);
 
-  // Prevent any form submission except when explicitly allowed
-  const handleFormSubmit = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Only allow submission if we're on the last step AND canSubmit is true
-    if (currentStep !== steps.length - 1 || !canSubmit) {
-      return false;
-    }
+  const handleFormSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (!validateStep(currentStep)) {
+      if (currentStep !== steps.length - 1 || !canSubmit) {
+        return false;
+      }
+
+      if (!validateStep(currentStep)) {
+        setCanSubmit(false);
+        return false;
+      }
+
+      try {
+        const finalData = {
+          ...formData,
+          applicant_id: formData.applicant_id || generateApplicantId(),
+          // Ensure location_type is set based on selected city
+          location_type: cityLocationMapping[formData.city] || "Tier2"
+        };
+
+        const csvData = convertToCSV(finalData);
+        const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+        const file = new File(
+          [blob],
+          `credit_application_${finalData.applicant_id}.csv`,
+          { type: "text/csv" }
+        );
+
+        if (onProcess && typeof onProcess === "function") {
+          onProcess(file);
+        } else {
+          console.error("onProcess function is not provided or not a function");
+        }
+      } catch (error) {
+        console.error("Error processing form data:", error);
+      }
+
       setCanSubmit(false);
       return false;
-    }
+    },
+    [
+      currentStep,
+      steps.length,
+      canSubmit,
+      validateStep,
+      formData,
+      generateApplicantId,
+      convertToCSV,
+      onProcess,
+      cityLocationMapping
+    ]
+  );
 
-    // Process the form
-    try {
-      const finalData = {
-        ...formData,
-        applicant_id: formData.applicant_id || generateApplicantId()
-      };
-
-      const csvData = convertToCSV(finalData);
-      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
-      const file = new File([blob], `credit_application_${finalData.applicant_id}.csv`, { type: 'text/csv' });
-
-      if (onProcess && typeof onProcess === 'function') {
-        onProcess(file);
-      } else {
-        console.error('onProcess function is not provided or not a function');
-      }
-    } catch (error) {
-      console.error('Error processing form data:', error);
-    }
-
-    // Reset submission permission
-    setCanSubmit(false);
-    return false;
-  }, [currentStep, steps.length, canSubmit, validateStep, formData, generateApplicantId, convertToCSV, onProcess]);
-
-  // Handle explicit submit button click
   const handleExplicitSubmit = useCallback(() => {
     if (currentStep === steps.length - 1) {
       setCanSubmit(true);
-      // Use setTimeout to ensure canSubmit state is updated before form submission
       setTimeout(() => {
         if (formRef.current) {
-          formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          formRef.current.dispatchEvent(
+            new Event("submit", { cancelable: true, bubbles: true })
+          );
         }
       }, 0);
     }
   }, [currentStep, steps.length]);
 
-  // Prevent Enter key from submitting form
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      // Optional: Move to next step on Enter (except on last step)
-      if (currentStep < steps.length - 1) {
-        nextStep();
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        if (currentStep < steps.length - 1) {
+          nextStep();
+        }
+        return false;
       }
-      return false;
-    }
-  }, [currentStep, steps.length, nextStep]);
+    },
+    [currentStep, steps.length, nextStep]
+  );
 
-  // Prevent any input from triggering form submission
   const handleInputKeyDown = useCallback((e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -288,7 +380,7 @@ function CreditRiskForm({ onProcess, isLoading }) {
             maxLength={50}
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Age *
@@ -301,11 +393,17 @@ function CreditRiskForm({ onProcess, isLoading }) {
             onKeyDown={handleInputKeyDown}
             min="18"
             max="100"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.age ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.age ? 'age-error' : undefined}
+            aria-describedby={errors.age ? "age-error" : undefined}
           />
-          {errors.age && <p id="age-error" className="text-red-500 text-xs mt-1">{errors.age}</p>}
+          {errors.age && (
+            <p id="age-error" className="text-red-500 text-xs mt-1">
+              {errors.age}
+            </p>
+          )}
         </div>
 
         <div>
@@ -317,16 +415,21 @@ function CreditRiskForm({ onProcess, isLoading }) {
             value={formData.gender}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.gender ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.gender ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.gender ? 'gender-error' : undefined}
+            aria-describedby={errors.gender ? "gender-error" : undefined}
           >
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Other">Other</option>
           </select>
-          {errors.gender && <p id="gender-error" className="text-red-500 text-xs mt-1">{errors.gender}</p>}
+          {errors.gender && (
+            <p id="gender-error" className="text-red-500 text-xs mt-1">
+              {errors.gender}
+            </p>
+          )}
         </div>
 
         <div>
@@ -338,19 +441,26 @@ function CreditRiskForm({ onProcess, isLoading }) {
             value={formData.education_level}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.education_level ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.education_level ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.education_level ? 'education-error' : undefined}
+            aria-describedby={
+              errors.education_level ? "education-error" : undefined
+            }
           >
             <option value="">Select Education Level</option>
             <option value="High School">High School</option>
-            <option value="Bachelor's Degree">Bachelor's Degree</option>
-            <option value="Master's Degree">Master's Degree</option>
-            <option value="PhD">PhD</option>
             <option value="Diploma">Diploma</option>
-            <option value="Other">Other</option>
+            <option value="Graduate">Graduate</option>
+            <option value="Post Graduate">Post Graduate</option>
+            <option value="Professional">Professional</option>
           </select>
-          {errors.education_level && <p id="education-error" className="text-red-500 text-xs mt-1">{errors.education_level}</p>}
+          {errors.education_level && (
+            <p id="education-error" className="text-red-500 text-xs mt-1">
+              {errors.education_level}
+            </p>
+          )}
         </div>
 
         <div>
@@ -362,19 +472,25 @@ function CreditRiskForm({ onProcess, isLoading }) {
             value={formData.employment_type}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.employment_type ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.employment_type ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.employment_type ? 'employment-error' : undefined}
+            aria-describedby={
+              errors.employment_type ? "employment-error" : undefined
+            }
           >
             <option value="">Select Employment Type</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Self-employed">Self-employed</option>
-            <option value="Unemployed">Unemployed</option>
-            <option value="Retired">Retired</option>
-            <option value="Student">Student</option>
+            <option value="Salaried">Salaried</option>
+            <option value="Self Employed">Self Employed</option>
+            <option value="Business Owner">Business Owner</option>
+            <option value="Professional">Professional</option>
           </select>
-          {errors.employment_type && <p id="employment-error" className="text-red-500 text-xs mt-1">{errors.employment_type}</p>}
+          {errors.employment_type && (
+            <p id="employment-error" className="text-red-500 text-xs mt-1">
+              {errors.employment_type}
+            </p>
+          )}
         </div>
 
         <div>
@@ -386,17 +502,23 @@ function CreditRiskForm({ onProcess, isLoading }) {
             value={formData.marital_status}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.marital_status ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.marital_status ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.marital_status ? 'marital-error' : undefined}
+            aria-describedby={
+              errors.marital_status ? "marital-error" : undefined
+            }
           >
             <option value="">Select Marital Status</option>
             <option value="Single">Single</option>
             <option value="Married">Married</option>
-            <option value="Divorced">Divorced</option>
-            <option value="Widowed">Widowed</option>
           </select>
-          {errors.marital_status && <p id="marital-error" className="text-red-500 text-xs mt-1">{errors.marital_status}</p>}
+          {errors.marital_status && (
+            <p id="marital-error" className="text-red-500 text-xs mt-1">
+              {errors.marital_status}
+            </p>
+          )}
         </div>
 
         <div>
@@ -411,11 +533,19 @@ function CreditRiskForm({ onProcess, isLoading }) {
             onKeyDown={handleInputKeyDown}
             min="1"
             max="20"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.family_size ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.family_size ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.family_size ? 'family-size-error' : undefined}
+            aria-describedby={
+              errors.family_size ? "family-size-error" : undefined
+            }
           />
-          {errors.family_size && <p id="family-size-error" className="text-red-500 text-xs mt-1">{errors.family_size}</p>}
+          {errors.family_size && (
+            <p id="family-size-error" className="text-red-500 text-xs mt-1">
+              {errors.family_size}
+            </p>
+          )}
         </div>
 
         <div>
@@ -434,29 +564,67 @@ function CreditRiskForm({ onProcess, isLoading }) {
           />
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location Type *
+            City * 
+            {formData.city && (
+              <span className="ml-2 text-sm text-blue-600">
+                (Location Type: {cityLocationMapping[formData.city] || "Tier2"})
+              </span>
+            )}
           </label>
           <select
-            name="location_type"
-            value={formData.location_type}
+            name="city"
+            value={formData.city}
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.location_type ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.city ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.location_type ? 'location-error' : undefined}
+            aria-describedby={errors.city ? "city-error" : undefined}
           >
-            <option value="">Select Location Type</option>
-            <option value="Urban">Urban</option>
-            <option value="Suburban">Suburban</option>
-            <option value="Rural">Rural</option>
+            <option value="">Select City</option>
+            <optgroup label="Metro Cities">
+              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="Gandhinagar">Gandhinagar</option>
+              <option value="Surat">Surat</option>
+              <option value="Vadodara">Vadodara</option>
+            </optgroup>
+            <optgroup label="Tier1 Cities">
+              <option value="Bhavnagar">Bhavnagar</option>
+              <option value="Jamnagar">Jamnagar</option>
+              <option value="Rajkot">Rajkot</option>
+              <option value="Surendranagar">Surendranagar</option>
+            </optgroup>
+            <optgroup label="Tier2 Cities">
+              <option value="Anand">Anand</option>
+              <option value="Bharuch">Bharuch</option>
+              <option value="Godhra">Godhra</option>
+              <option value="Junagadh">Junagadh</option>
+              <option value="Mehsana">Mehsana</option>
+              <option value="Morbi">Morbi</option>
+              <option value="Nadiad">Nadiad</option>
+              <option value="Navsari">Navsari</option>
+              <option value="Palanpur">Palanpur</option>
+              <option value="Patan">Patan</option>
+              <option value="Porbandar">Porbandar</option>
+              <option value="Valsad">Valsad</option>
+              <option value="Vapi">Vapi</option>
+              <option value="Veraval">Veraval</option>
+            </optgroup>
           </select>
-          {errors.location_type && <p id="location-error" className="text-red-500 text-xs mt-1">{errors.location_type}</p>}
+          {errors.city && (
+            <p id="city-error" className="text-red-500 text-xs mt-1">
+              {errors.city}
+            </p>
+          )}
         </div>
       </div>
     </div>
   );
+
+  // ... rest of your render methods remain the same (renderFinancialInfo, etc.)
 
   const renderFinancialInfo = () => (
     <div className="space-y-4">
@@ -473,11 +641,19 @@ function CreditRiskForm({ onProcess, isLoading }) {
             onKeyDown={handleInputKeyDown}
             min="0"
             step="1"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.monthly_income_inr ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.monthly_income_inr ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.monthly_income_inr ? 'income-error' : undefined}
+            aria-describedby={
+              errors.monthly_income_inr ? "income-error" : undefined
+            }
           />
-          {errors.monthly_income_inr && <p id="income-error" className="text-red-500 text-xs mt-1">{errors.monthly_income_inr}</p>}
+          {errors.monthly_income_inr && (
+            <p id="income-error" className="text-red-500 text-xs mt-1">
+              {errors.monthly_income_inr}
+            </p>
+          )}
         </div>
 
         <div>
@@ -508,11 +684,48 @@ function CreditRiskForm({ onProcess, isLoading }) {
             onKeyDown={handleInputKeyDown}
             min="0"
             step="1"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.monthly_expenses_inr ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.monthly_expenses_inr ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.monthly_expenses_inr ? 'expenses-error' : undefined}
+            aria-describedby={
+              errors.monthly_expenses_inr ? "expenses-error" : undefined
+            }
           />
-          {errors.monthly_expenses_inr && <p id="expenses-error" className="text-red-500 text-xs mt-1">{errors.monthly_expenses_inr}</p>}
+          {errors.monthly_expenses_inr && (
+            <p id="expenses-error" className="text-red-500 text-xs mt-1">
+              {errors.monthly_expenses_inr}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Loan Amount Applied (INR) *
+          </label>
+          <input
+            type="number"
+            name="loan_amount_applied_inr"
+            value={formData.loan_amount_applied_inr}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="1000"
+            step="1000"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.loan_amount_applied_inr
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.loan_amount_applied_inr ? "loan-amount-error" : undefined
+            }
+          />
+          {errors.loan_amount_applied_inr && (
+            <p id="loan-amount-error" className="text-red-500 text-xs mt-1">
+              {errors.loan_amount_applied_inr}
+            </p>
+          )}
         </div>
 
         <div>
@@ -610,50 +823,6 @@ function CreditRiskForm({ onProcess, isLoading }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-      </div>
-    </div>
-  );
-
-  const renderEmploymentBanking = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Years in Current Employment *
-          </label>
-          <input
-            type="number"
-            name="years_current_employment"
-            value={formData.years_current_employment}
-            onChange={handleInputChange}
-            onKeyDown={handleInputKeyDown}
-            min="0"
-            step="0.1"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.years_current_employment ? 'border-red-500' : 'border-gray-300'}`}
-            required
-            aria-describedby={errors.years_current_employment ? 'employment-years-error' : undefined}
-          />
-          {errors.years_current_employment && <p id="employment-years-error" className="text-red-500 text-xs mt-1">{errors.years_current_employment}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Banking Relationship Years *
-          </label>
-          <input
-            type="number"
-            name="banking_relationship_years"
-            value={formData.banking_relationship_years}
-            onChange={handleInputChange}
-            onKeyDown={handleInputKeyDown}
-            min="0"
-            step="0.1"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.banking_relationship_years ? 'border-red-500' : 'border-gray-300'}`}
-            required
-            aria-describedby={errors.banking_relationship_years ? 'banking-years-error' : undefined}
-          />
-          {errors.banking_relationship_years && <p id="banking-years-error" className="text-red-500 text-xs mt-1">{errors.banking_relationship_years}</p>}
-        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -675,6 +844,77 @@ function CreditRiskForm({ onProcess, isLoading }) {
     </div>
   );
 
+  const renderEmploymentBanking = () => (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Years in Current Employment *
+          </label>
+          <input
+            type="number"
+            name="years_current_employment"
+            value={formData.years_current_employment}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="0.1"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.years_current_employment
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.years_current_employment
+                ? "employment-years-error"
+                : undefined
+            }
+          />
+          {errors.years_current_employment && (
+            <p
+              id="employment-years-error"
+              className="text-red-500 text-xs mt-1"
+            >
+              {errors.years_current_employment}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Banking Relationship Years *
+          </label>
+          <input
+            type="number"
+            name="banking_relationship_years"
+            value={formData.banking_relationship_years}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            step="0.1"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.banking_relationship_years
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+            aria-describedby={
+              errors.banking_relationship_years
+                ? "banking-years-error"
+                : undefined
+            }
+          />
+          {errors.banking_relationship_years && (
+            <p id="banking-years-error" className="text-red-500 text-xs mt-1">
+              {errors.banking_relationship_years}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderDigitalBehavior = () => (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -691,11 +931,19 @@ function CreditRiskForm({ onProcess, isLoading }) {
             min="0"
             max="24"
             step="0.5"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.daily_mobile_hours ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.daily_mobile_hours ? "border-red-500" : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.daily_mobile_hours ? 'mobile-hours-error' : undefined}
+            aria-describedby={
+              errors.daily_mobile_hours ? "mobile-hours-error" : undefined
+            }
           />
-          {errors.daily_mobile_hours && <p id="mobile-hours-error" className="text-red-500 text-xs mt-1">{errors.daily_mobile_hours}</p>}
+          {errors.daily_mobile_hours && (
+            <p id="mobile-hours-error" className="text-red-500 text-xs mt-1">
+              {errors.daily_mobile_hours}
+            </p>
+          )}
         </div>
 
         <div>
@@ -710,11 +958,26 @@ function CreditRiskForm({ onProcess, isLoading }) {
             onKeyDown={handleInputKeyDown}
             min="0"
             step="1"
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.monthly_digital_transactions ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.monthly_digital_transactions
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
             required
-            aria-describedby={errors.monthly_digital_transactions ? 'digital-transactions-error' : undefined}
+            aria-describedby={
+              errors.monthly_digital_transactions
+                ? "digital-transactions-error"
+                : undefined
+            }
           />
-          {errors.monthly_digital_transactions && <p id="digital-transactions-error" className="text-red-500 text-xs mt-1">{errors.monthly_digital_transactions}</p>}
+          {errors.monthly_digital_transactions && (
+            <p
+              id="digital-transactions-error"
+              className="text-red-500 text-xs mt-1"
+            >
+              {errors.monthly_digital_transactions}
+            </p>
+          )}
         </div>
 
         <div>
@@ -758,56 +1021,91 @@ function CreditRiskForm({ onProcess, isLoading }) {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-blue-800">
           <i className="fas fa-info-circle mr-2"></i>
-          Please rate yourself on a scale of 0-100 for the following aspects. These values are pre-filled with reasonable defaults but you can adjust them based on your self-assessment.
+          Please rate yourself on a scale of 0-100 for these digital behavior
+          aspects.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[
-          { name: 'mobile_app_usage_intensity_score', label: 'Mobile App Usage Intensity (0-100)' },
-          { name: 'digital_payment_adoption_score', label: 'Digital Payment Adoption (0-100)' },
-          { name: 'utility_payment_regularity_score', label: 'Utility Payment Regularity (0-100)' },
-          { name: 'location_stability_score', label: 'Location Stability (0-100)' },
-          { name: 'mobile_banking_usage_score', label: 'Mobile Banking Usage (0-100)' },
-          { name: 'payment_reliability_score', label: 'Payment Reliability (0-100)' },
-          { name: 'financial_health_score', label: 'Financial Health (0-100)' },
-          { name: 'stability_index', label: 'Stability Index (0-100)' },
-          { name: 'timeliness_score', label: 'Timeliness Score (0-100)' },
-          { name: 'repayment_ability_score', label: 'Repayment Ability (0-100)' }
-        ].map(field => (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {field.label}
-            </label>
-            <input
-              type="number"
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleInputChange}
-              onKeyDown={handleInputKeyDown}
-              min="0"
-              max="100"
-              step="1"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                errors[field.name] ? 'border-red-500' : 'border-gray-300'
-              }`}
-              aria-describedby={errors[field.name] ? `${field.name}-error` : undefined}
-            />
-            {errors[field.name] && <p id={`${field.name}-error`} className="text-red-500 text-xs mt-1">{errors[field.name]}</p>}
-          </div>
-        ))}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Mobile App Usage Intensity (0-100)
+          </label>
+          <input
+            type="number"
+            name="mobile_app_usage_intensity_score"
+            value={formData.mobile_app_usage_intensity_score}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            max="100"
+            step="1"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.mobile_app_usage_intensity_score
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            aria-describedby={
+              errors.mobile_app_usage_intensity_score
+                ? "mobile-app-error"
+                : undefined
+            }
+          />
+          {errors.mobile_app_usage_intensity_score && (
+            <p id="mobile-app-error" className="text-red-500 text-xs mt-1">
+              {errors.mobile_app_usage_intensity_score}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Digital Payment Adoption (0-100)
+          </label>
+          <input
+            type="number"
+            name="digital_payment_adoption_score"
+            value={formData.digital_payment_adoption_score}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
+            min="0"
+            max="100"
+            step="1"
+            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              errors.digital_payment_adoption_score
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+            aria-describedby={
+              errors.digital_payment_adoption_score
+                ? "digital-payment-error"
+                : undefined
+            }
+          />
+          {errors.digital_payment_adoption_score && (
+            <p id="digital-payment-error" className="text-red-500 text-xs mt-1">
+              {errors.digital_payment_adoption_score}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
 
   const renderCurrentStep = () => {
-    switch(currentStep) {
-      case 0: return renderPersonalInfo();
-      case 1: return renderFinancialInfo();
-      case 2: return renderEmploymentBanking();
-      case 3: return renderDigitalBehavior();
-      case 4: return renderRiskScores();
-      default: return renderPersonalInfo();
+    switch (currentStep) {
+      case 0:
+        return renderPersonalInfo();
+      case 1:
+        return renderFinancialInfo();
+      case 2:
+        return renderEmploymentBanking();
+      case 3:
+        return renderDigitalBehavior();
+      case 4:
+        return renderRiskScores();
+      default:
+        return renderPersonalInfo();
     }
   };
 
@@ -825,22 +1123,34 @@ function CreditRiskForm({ onProcess, isLoading }) {
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`flex items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}
+              className={`flex items-center ${
+                index < steps.length - 1 ? "flex-1" : ""
+              }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                   index <= currentStep
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-600'
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-600"
                 }`}
               >
                 {index + 1}
               </div>
-              <span className={`ml-2 text-sm ${index <= currentStep ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+              <span
+                className={`ml-2 text-sm ${
+                  index <= currentStep
+                    ? "text-blue-600 font-medium"
+                    : "text-gray-500"
+                }`}
+              >
                 {step}
               </span>
               {index < steps.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-4 ${index < currentStep ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                <div
+                  className={`flex-1 h-0.5 mx-4 ${
+                    index < currentStep ? "bg-blue-600" : "bg-gray-200"
+                  }`}
+                />
               )}
             </div>
           ))}
@@ -868,8 +1178,8 @@ function CreditRiskForm({ onProcess, isLoading }) {
             disabled={currentStep === 0}
             className={`px-6 py-3 rounded-lg font-medium flex items-center transition-colors ${
               currentStep === 0
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-600 text-white hover:bg-gray-700'
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-gray-600 text-white hover:bg-gray-700"
             }`}
           >
             <i className="fas fa-arrow-left mr-2"></i>
@@ -892,8 +1202,8 @@ function CreditRiskForm({ onProcess, isLoading }) {
               disabled={isLoading}
               className={`px-6 py-3 font-medium text-white rounded-lg flex items-center transition-colors ${
                 isLoading
-                  ? 'bg-blue-300 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700'
+                  ? "bg-blue-300 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
               }`}
             >
               {isLoading ? (
@@ -918,7 +1228,10 @@ function CreditRiskForm({ onProcess, isLoading }) {
           Need Help?
         </h4>
         <p className="text-sm text-yellow-700">
-          This form collects personal information for credit risk assessment. All financial amounts should be in Indian Rupees (INR). Fields marked with * are required. Data will be processed securely and used only for credit evaluation.
+          This form collects personal information for credit risk assessment.
+          All financial amounts should be in Indian Rupees (INR). Fields marked
+          with * are required. Location type is automatically determined based on your selected city.
+          Data will be processed securely and used only for credit evaluation.
         </p>
       </div>
     </div>

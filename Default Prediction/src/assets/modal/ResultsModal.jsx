@@ -1,7 +1,9 @@
-import React, { useEffect, useCallback } from 'react';
-import ResultsDisplay from '../../components/ResultsDisplay';
+import React, { useEffect, useCallback } from "react";
+import ResultsDisplay from "../../components/ResultsDisplay";
+import UserResults from "../../components/UserResults";
 
 function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
+  const userType=localStorage.getItem("userType");
   const handleClose = useCallback(
     (e) => {
       e?.stopPropagation(); // Prevent event bubbling
@@ -13,7 +15,7 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
   // Close on Escape
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         e.preventDefault();
         e.stopPropagation();
         handleClose();
@@ -21,13 +23,13 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, handleClose]);
 
@@ -51,7 +53,9 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
       <div className="bg-white rounded-xl shadow-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden flex flex-col relative">
         {/* Header */}
         <div className="flex items-center justify-between p-6 pr-16 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Analysis Results</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Analysis Results
+          </h2>
           {/* Close button */}
           <button
             type="button"
@@ -75,11 +79,13 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
           </button>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {userType === "user" ? (
+          <UserResults data={analysisData.jsonData} />
+        ) : (
+          <div className="flex-1 overflow-y-auto p-6">
           {analysisData ? (
             <ResultsDisplay
-              data={analysisData.jsonData}
+            data={analysisData.jsonData}
               filename={analysisData.fileName}
               showNotification={showNotification}
             />
@@ -101,12 +107,15 @@ function ResultsModal({ isOpen, onClose, analysisData, showNotification }) {
                 </svg>
                 <p className="text-gray-500 mb-2">No analysis data available</p>
                 <p className="text-sm text-gray-400">
-                  {analysisData ? 'Data structure may be different than expected' : 'No data provided'}
+                  {analysisData
+                    ? "Data structure may be different than expected"
+                    : "No data provided"}
                 </p>
               </div>
             </div>
           )}
         </div>
+                  )}
       </div>
     </div>
   );

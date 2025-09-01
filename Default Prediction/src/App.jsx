@@ -201,44 +201,47 @@ function AppInner() {
       const newAnalysis = {
         filename: file.name,
         jsonData: data.data,
-        timestamp: new Date().toISOString(),
-        recordCount: data.data.length,
-        processedRows: data.processed_rows
+        timestamp: new Date().toISOString()
       };
 
-      if (userType === "user") {
-        localStorage.setItem("userAnalysisData", JSON.stringify(data.data));
-        
+      // Save to backend for BOTH user types (FIXED)
+      try {
+        const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
+        await fetchAnalysisHistory();
+
         setAnalysisData(newAnalysis);
         setShowModal(true);
-        showNotification(`Analysis completed! Processed ${data.data.length} records.`, "success");
-      } else {
-        try {
-          const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
-          await fetchAnalysisHistory();
 
-          setAnalysisData(newAnalysis);
-          setShowModal(true);
+        if (userType === "user") {
+          // Additional localStorage save for users
+          localStorage.setItem("userAnalysisData", JSON.stringify(data.data));
+          showNotification(`Your analysis completed successfully! Processed ${data.data.length} records.`, "success");
+        } else {
           showNotification(
             `Analysis completed and saved successfully! Processed ${data.data.length} records.`,
             "success"
           );
-        } catch (saveError) {
-          console.error("Save error:", saveError);
-
-          setAnalysisData({
-            filename: file.name,
-            jsonData: data.data,
-            timestamp: new Date().toISOString(),
-            recordCount: data.data.length
-          });
-
-          setShowModal(true);
-          showNotification(
-            `Analysis completed but failed to save to server. Processed ${data.data.length} records.`,
-            "warning"
-          );
         }
+      } catch (saveError) {
+        console.error("Save error:", saveError);
+
+        // Fallback for both user types when save fails
+        setAnalysisData({
+          filename: file.name,
+          jsonData: data.data,
+          timestamp: new Date().toISOString(),
+          recordCount: data.data.length
+        });
+
+        if (userType === "user") {
+          localStorage.setItem("userAnalysisData", JSON.stringify(data.data));
+        }
+
+        setShowModal(true);
+        showNotification(
+          `Analysis completed but failed to save to server. Processed ${data.data.length} records.`,
+          "warning"
+        );
       }
     } catch (error) {
       console.error("Processing error:", error);
@@ -264,6 +267,7 @@ function AppInner() {
     return <LoadingOverlay />;
   }
 
+  console.log("analysisHistory:", analysisHistory);
   return (
     <>
       {notification && (
