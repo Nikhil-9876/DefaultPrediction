@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: ['http://localhost:5173','http://localhost:5174','https://defaultprediction-frontend.onrender.com'],
+  origin: ['http://localhost:5173','http://localhost:5174','https://defaultprediction-frontend.onrender.com','https://riskanalyzer-s239.onrender.com'],
   credentials: true
 }));
 
