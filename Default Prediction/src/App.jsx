@@ -66,7 +66,7 @@ function AppInner() {
     try {
       const token = localStorage.getItem("token");
       const analysisId = analysis._id || analysis.id;
-      
+
       const response = await fetch(
         `http://localhost:4000/results/DeleteResult/${analysisId}`,
         {
@@ -79,8 +79,8 @@ function AppInner() {
       );
 
       if (response.ok) {
-        setAnalysisHistory(prev => 
-          prev.filter(item => (item._id || item.id) !== analysisId)
+        setAnalysisHistory((prev) =>
+          prev.filter((item) => (item._id || item.id) !== analysisId)
         );
         showNotification("Analysis deleted successfully", "success");
       } else {
@@ -100,9 +100,9 @@ function AppInner() {
     const handleAuthChange = () => {
       const token = localStorage.getItem("token");
       const loggedIn = !!token;
-      
+
       setIsLoggedIn(loggedIn);
-      
+
       if (loggedIn) {
         fetchAnalysisHistory();
       } else {
@@ -137,7 +137,7 @@ function AppInner() {
   const saveAnalysisToBackend = async (analysisData) => {
     try {
       const token = localStorage.getItem("token");
-      
+
       const response = await fetch(
         "http://localhost:4000/results/SaveResults",
         {
@@ -186,25 +186,51 @@ function AppInner() {
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Python endpoint error:", errorText);
-        throw new Error(`Analysis failed: ${response.status} - ${errorText}`);
+        // Try to capture JSON errors else fallback to text for better diagnostics
+        const contentType = response.headers.get("content-type") || "";
+        const errorPayload = contentType.includes("application/json")
+          ? await response.json()
+          : await response.text();
+        console.error("Python endpoint error:", errorPayload);
+        throw new Error(
+          `Analysis failed: ${response.status} - ${
+            typeof errorPayload === "string"
+              ? errorPayload
+              : JSON.stringify(errorPayload)
+          }`
+        );
       }
 
-      const data = await response.json();
+      // Parse as JSON; may be an array (new API) or object (legacy)
+      const parsed = await response.json();
 
-      if (!data || !data.data || !Array.isArray(data.data) || data.data.length === 0) {
-        console.error("Invalid response structure:", data);
+      // Normalize to an array of records
+      const records = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.data)
+        ? parsed.data
+        : Array.isArray(parsed?.records)
+        ? parsed.records
+        : Array.isArray(parsed?.result)
+        ? parsed.result
+        : Array.isArray(parsed?.payload)
+        ? parsed.payload
+        : null;
+
+      if (!Array.isArray(records) || records.length === 0) {
+        console.error("Invalid response structure:", parsed);
         throw new Error("Analysis returned empty or invalid results");
       }
 
       const newAnalysis = {
         filename: file.name,
-        jsonData: data.data,
-        timestamp: new Date().toISOString()
+        jsonData: records,
+        timestamp: new Date().toISOString(),
       };
 
-      // Save to backend for BOTH user types (FIXED)
+      console.log("New analysis data:", newAnalysis);
+
+      // Save to backend for BOTH user types
       try {
         const savedAnalysis = await saveAnalysisToBackend(newAnalysis);
         await fetchAnalysisHistory();
@@ -214,11 +240,14 @@ function AppInner() {
 
         if (userType === "user") {
           // Additional localStorage save for users
-          localStorage.setItem("userAnalysisData", JSON.stringify(data.data));
-          showNotification(`Your analysis completed successfully! Processed ${data.data.length} records.`, "success");
+          localStorage.setItem("userAnalysisData", JSON.stringify(records));
+          showNotification(
+            `Your analysis completed successfully! Processed ${records.length} records.`,
+            "success"
+          );
         } else {
           showNotification(
-            `Analysis completed and saved successfully! Processed ${data.data.length} records.`,
+            `Analysis completed and saved successfully! Processed ${records.length} records.`,
             "success"
           );
         }
@@ -228,18 +257,18 @@ function AppInner() {
         // Fallback for both user types when save fails
         setAnalysisData({
           filename: file.name,
-          jsonData: data.data,
+          jsonData: records,
           timestamp: new Date().toISOString(),
-          recordCount: data.data.length
+          recordCount: records.length,
         });
 
         if (userType === "user") {
-          localStorage.setItem("userAnalysisData", JSON.stringify(data.data));
+          localStorage.setItem("userAnalysisData", JSON.stringify(records));
         }
 
         setShowModal(true);
         showNotification(
-          `Analysis completed but failed to save to server. Processed ${data.data.length} records.`,
+          `Analysis completed but failed to save to server. Processed ${records.length} records.`,
           "warning"
         );
       }
@@ -267,7 +296,6 @@ function AppInner() {
     return <LoadingOverlay />;
   }
 
-  console.log("analysisHistory:", analysisHistory);
   return (
     <>
       {notification && (
@@ -351,7 +379,7 @@ function AppInner() {
               </Layout>
             }
           />
-          
+
           <Route
             path="/about"
             element={

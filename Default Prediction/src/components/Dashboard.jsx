@@ -4,25 +4,19 @@ import { Link } from "react-router-dom";
 function Dashboard({ history, onLoadAnalysis }) {
   const totalAnalyses = history.length;
   const lastAnalysis = history[0];
-  console.log("history in dash", lastAnalysis);
-
   const usertype = localStorage.getItem("userType");
 
-  // Calculate total portfolio stats from ALL analyses
   const getTotalPortfolioStats = (analysisHistory) => {
     let totalApproved = 0;
     let totalRejected = 0;
     let totalPending = 0;
 
     analysisHistory.forEach((analysis) => {
-      // Check if jsonData exists and is an array
       if (analysis.jsonData && Array.isArray(analysis.jsonData)) {
         analysis.jsonData.forEach((applicant) => {
-          // Check if applicant has a risk_category property
           if (applicant.risk_category) {
             const risk = applicant.risk_category.toLowerCase();
             
-            // Map risk categories to status
             if (risk.includes('low')) totalApproved += 1;
             else if (risk.includes('medium') || risk.includes('pending')) totalPending += 1;
             else if (risk.includes('high') || risk.includes('rejected') || risk.includes('very')) totalRejected += 1;
@@ -40,7 +34,6 @@ function Dashboard({ history, onLoadAnalysis }) {
   };
 
   const portfolioStats = getTotalPortfolioStats(history);
-  console.log("portfolioStats", portfolioStats);
 
   return (
     <div className="space-y-6">

@@ -31,7 +31,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
       let decision = 'Review'; // Default
       if (riskCategory === 'Low Risk') decision = 'Approve';
       else if (riskCategory === 'High Risk' || riskCategory === 'Very High Risk') decision = 'Reject';
-      
+
       approvalSummary[decision] = (approvalSummary[decision] || 0) + 1;
 
       // Calculate averages
@@ -58,8 +58,6 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
   // Convert flat data structure to match ApplicantCard expected format
   const convertToApplicantCardFormat = (applicant) => {
-    console.log("Converting applicant data for card:", applicant);
-    
     return {
       applicant_id: applicant.applicant_id || "N/A",
       demographics: {
@@ -114,24 +112,32 @@ function ResultsDisplay({ data, filename, showNotification }) {
         }
       ],
       loan_details: {
+        loan_applied: applicant.loan_amount_applied_inr,
+        loan_type: applicant.loan_type || "Personal Loan",
+        interest_rate: applicant.interest_rate,
+        application_date: applicant.application_date,
+        outstanding_amount: applicant.outstanding_loan_amount_inr,
+        property_value: applicant.property_value_inr,
+        dscr: applicant.debt_service_coverage,
+        income_expense_ratio: applicant.income_to_expense_ratio,
+        utilization_ratio: applicant.loan_utilization_ratio,
         eligibility: applicant.risk_category === "Low Risk" ? "Eligible" : 
-                    applicant.risk_category === "Medium Risk" ? "Review Required" : "Not Eligible",
+                   applicant.risk_category === "Medium Risk" ? "Review Required" : "Not Eligible",
         loan_range: {
-          minimum: Math.round(applicant.monthly_income_inr * 6),
-          maximum: Math.round(applicant.monthly_income_inr * 60)
+          minimum: Math.round((applicant.monthly_income_inr || 0) * 6),
+          maximum: Math.round((applicant.monthly_income_inr || 0) * 60)
         },
         terms: {
           tenure_months: applicant.risk_category === "Low Risk" ? 60 : 
-                        applicant.risk_category === "Medium Risk" ? 36 : 24,
+                       applicant.risk_category === "Medium Risk" ? 36 : 24,
           monthly_emi: Math.round((applicant.loan_amount_applied_inr || applicant.monthly_income_inr * 12) / 36),
           interest_rate_range: {
             min: applicant.risk_category === "Low Risk" ? 8.5 : 
-                 applicant.risk_category === "Medium Risk" ? 12.5 : 18.0,
+                applicant.risk_category === "Medium Risk" ? 12.5 : 18.0,
             max: applicant.risk_category === "Low Risk" ? 12.0 : 
-                 applicant.risk_category === "Medium Risk" ? 16.0 : 24.0
+                applicant.risk_category === "Medium Risk" ? 16.0 : 24.0
           }
-        },
-        purpose: "Personal Loan"
+        }
       }
     };
   };
@@ -145,7 +151,6 @@ function ResultsDisplay({ data, filename, showNotification }) {
     data.forEach(applicant => {
       Object.keys(applicant).forEach(key => allKeys.add(key));
     });
-    
     return Array.from(allKeys).sort();
   };
 
@@ -223,6 +228,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
     const blob = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -242,7 +248,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
     }
 
     // Create headers from all field names
-    const headers = allFields.map(field => 
+    const headers = allFields.map(field =>
       field
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -294,12 +300,12 @@ function ResultsDisplay({ data, filename, showNotification }) {
   };
 
   const filteredApplicants = Array.isArray(data) ? data.filter((applicant) => {
-    const matchesSearch =
+    const matchesSearch = 
       (applicant.applicant_id && applicant.applicant_id.toString().includes(searchTerm)) ||
       (applicant.age && applicant.age.toString().includes(searchTerm)) ||
       searchTerm === "";
 
-    const matchesFilter =
+    const matchesFilter = 
       filter === "all" ||
       (filter === "approve" && (applicant.risk_category === "Low Risk")) ||
       (filter === "review" && (applicant.risk_category === "Medium Risk")) ||
@@ -322,198 +328,127 @@ function ResultsDisplay({ data, filename, showNotification }) {
 
   if (!data || !Array.isArray(data) || data.length === 0) {
     return (
-      <div className="text-center text-gray-500 mt-8">
-        Upload and analyze a CSV file to see results
+      <div className="p-8 bg-gray-50 rounded-lg">
+        <div className="text-center">
+          <i className="fas fa-exclamation-circle text-6xl text-gray-400 mb-4"></i>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">No Data Available</h3>
+          <p className="text-gray-500">Please upload a file to see the analysis results.</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Analysis Results - {filename}
-        </h2>
-        <div className="flex space-x-2">
-          <button
-            onClick={handleExportCSV}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center space-x-2"
-          >
-            <span>📊</span>
-            <span>Export CSV ({allFields.length} fields)</span>
-          </button>
-          <button
-            onClick={handleExportExcel}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center space-x-2"
-          >
-            <span>📈</span>
-            <span>Export Excel ({allFields.length} fields)</span>
-          </button>
-        </div>
-      </div>
+      {/* Summary Cards */}
+      {summaryData && <SummaryCards summaryData={summaryData} />}
 
-      {/* Display field count info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center">
-          <div className="flex-shrink-0">
-            <span className="text-blue-400">ℹ️</span>
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">
-              Dataset Information
-            </h3>
-            <div className="mt-2 text-sm text-blue-700">
-              <p>• Total Records: {data.length}</p>
-              <p>• Fields Per Record: {allFields.length}</p>
-              <p>• Export includes all {allFields.length} fields from the analysis</p>
-              <p>• Click on any row to view detailed analysis</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Summary Cards with calculated data */}
-      {summaryData && <SummaryCards data={summaryData.approvalSummary} />}
-
-      <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Individual Applicants ({data.length})
-          </h3>
-          <div className="flex space-x-4">
+      {/* Export and Filter Controls */}
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 flex-1">
             <input
               type="text"
-              placeholder="Search by ID or age..."
+              placeholder="Search by ID or Age..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <select
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Risk Levels</option>
-              <option value="approve">Low Risk (Approve)</option>
-              <option value="review">Medium Risk (Review)</option>
-              <option value="reject">High Risk (Reject)</option>
+              <option value="all">All Applications</option>
+              <option value="approve">Approve (Low Risk)</option>
+              <option value="review">Review (Medium Risk)</option>
+              <option value="reject">Reject (High/Very High Risk)</option>
             </select>
           </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleExportCSV}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+            >
+              <i className="fas fa-file-csv"></i>
+              Export CSV
+            </button>
+            <button
+              onClick={handleExportExcel}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <i className="fas fa-file-excel"></i>
+              Export Excel
+            </button>
+          </div>
         </div>
 
+        <div className="text-sm text-gray-600 mb-4 flex flex-wrap gap-4">
+          <span>• Total Records: {data.length}</span>
+          <span>• Fields Per Record: {allFields.length}</span>
+          <span>• Export includes all {allFields.length} fields from the analysis</span>
+          <span>• Click on any row to view detailed analysis</span>
+        </div>
+
+        {/* Table Header */}
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-50">
+          <table className="w-full border-collapse border border-gray-300">
+            <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Age
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Monthly Income
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Risk Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Risk Score
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Repayment Score
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Action
-                </th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Age</th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Monthly Income</th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Risk Category</th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Risk Score</th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Repayment Score</th>
+                <th className="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Action</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredApplicants.map((applicant, index) => {
-                const applicantId = applicant.applicant_id || index;
-                const isExpanded = expandedApplicant === applicantId;
-                
-                return (
-                  <React.Fragment key={applicantId}>
-                    <tr
-                      className={`hover:bg-gray-50 cursor-pointer transition-colors ${
-                        isExpanded ? 'bg-blue-50' : ''
-                      }`}
-                      onClick={() => handleRowClick(applicant.applicant_id, index)}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {applicant.applicant_id || `APPL_${index + 1}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {applicant.age}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ₹{applicant.monthly_income_inr?.toLocaleString() || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            applicant.risk_category === "Low Risk"
-                              ? "bg-green-100 text-green-800"
-                              : applicant.risk_category === "Medium Risk"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {applicant.risk_category}
-                        </span>
-                        <span className="ml-2 text-xs text-gray-500">
-                          ({(applicant.probability_of_default * 100).toFixed(1)}%)
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {applicant.risk_score?.toFixed(1)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {applicant.repayment_ability_score}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className="text-blue-600 font-medium">
-                          {isExpanded ? '▼ Collapse' : '▶ Expand'}
-                        </span>
-                      </td>
-                    </tr>
-                    
-                    
-                    {/* Expanded Row with ApplicantCard */}
-                    {isExpanded && (
-                      <tr>
-                        <td colSpan={7} className="px-0 py-0 bg-gray-50">
-                          <div className="border-t border-gray-200 p-4">
-                            <ApplicantCard
-                              applicant={convertToApplicantCardFormat(applicant)}
-                              isExpanded={true}
-                              onToggle={() => setExpandedApplicant(null)}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
           </table>
-        </div>
 
-        {filteredApplicants.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            No applicants match your search criteria
+          {/* Applicant Cards */}
+          <div className="space-y-3 mt-4">
+            {filteredApplicants.map((applicant, index) => {
+              const convertedApplicant = convertToApplicantCardFormat(applicant);
+              const identifier = applicant.applicant_id || index;
+              const isExpanded = expandedApplicant === identifier;
+
+              return (
+                <div key={identifier} className="border border-gray-200 rounded-lg overflow-hidden">
+                  {/* Summary Row */}
+                  <div 
+                    className="grid grid-cols-7 gap-4 p-4 bg-white hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100"
+                    onClick={() => handleRowClick(applicant.applicant_id, index)}
+                  >
+                    <div className="font-semibold text-gray-900">
+                      {applicant.applicant_id || `APPL_${index + 1}`}
+                    </div>
+                    <div className="text-gray-700">{applicant.age}</div>
+                    <div className="text-gray-700">
+                      ₹{applicant.monthly_income_inr?.toLocaleString() || "N/A"}
+                    </div>
+                    <div className="text-gray-700">
+                      {applicant.risk_category} ({(applicant.probability_of_default * 100).toFixed(1)}%)
+                    </div>
+                    <div className="text-gray-700">{applicant.risk_score?.toFixed(1)}</div>
+                    <div className="text-gray-700">{applicant.repayment_ability_score}</div>
+                    <div className="text-blue-600 font-medium">
+                      {isExpanded ? '▼ Collapse' : '▶ Expand'}
+                    </div>
+                  </div>
+
+                  {/* Expanded ApplicantCard */}
+                  {isExpanded && (
+                    <ApplicantCard
+                      applicant={convertedApplicant}
+                      isExpanded={true}
+                      onToggle={() => {}} // Empty since we handle toggle in parent
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
-        )}
-
-        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500">
-          Showing {filteredApplicants.length} of {data.length} applicants
-          {expandedApplicant && (
-            <span className="ml-4 text-blue-600">
-              • Detailed view active for {expandedApplicant}
-            </span>
-          )}
         </div>
       </div>
     </div>

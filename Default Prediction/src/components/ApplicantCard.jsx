@@ -9,13 +9,12 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
     loan_details,
   } = applicant;
 
+  console.log("demo for:", demographics.dependents);
   const badgeColor = (value) => {
     const lower = value?.toLowerCase();
-    if (lower === "low" || lower === "approve")
-      return "bg-green-100 text-green-700";
-    if (lower === "medium" || lower === "review")
-      return "bg-yellow-100 text-yellow-800";
-    if (lower === "high" || lower === "reject")
+    if (lower === "low" || lower === "approve") return "bg-green-100 text-green-700";
+    if (lower === "medium" || lower === "review") return "bg-yellow-100 text-yellow-800";
+    if (lower === "high" || lower === "reject" || lower?.includes("very high")) 
       return "bg-red-100 text-red-700";
     return "bg-gray-200 text-gray-800";
   };
@@ -26,16 +25,32 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
     return "text-red-600";
   };
 
-  // Safe formatting functions
+  // Enhanced formatting functions
   const formatCurrency = (amount) => {
-    return amount ? `₹${amount.toLocaleString()}` : "N/A";
+    if (amount === null || amount === undefined || !isFinite(amount)) return "N/A";
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(Number(amount));
   };
 
   const formatPercentage = (value) => {
-    return value ? `${(value * 100).toFixed(1)}%` : "N/A";
+    if (value === null || value === undefined || !isFinite(value)) return "N/A";
+    // Handle both 0-1 range and 0-100 range
+    const normalizedValue = value > 1 ? value / 100 : value;
+    return new Intl.NumberFormat("en-US", {
+      style: "percent",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(normalizedValue);
   };
 
-  // Helper function to handle zero values properly
+  const formatNumber = (value, decimals = 2) => {
+    if (value === null || value === undefined || !isFinite(value)) return "N/A";
+    return Number(value).toFixed(decimals);
+  };
+
   const safeDisplayValue = (value, fallback = "N/A") => {
     return value !== undefined && value !== null ? value : fallback;
   };
@@ -57,37 +72,37 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
         <div className="col-span-2 text-sm text-gray-700">
           <span className="inline-flex items-center">
             <i className="fas fa-user mr-1 text-gray-400"></i>
-            Age: {safeDisplayValue(demographics.age)}
+            Age: {safeDisplayValue(demographics?.age)}
           </span>
         </div>
         <div className="col-span-2 text-sm font-medium text-gray-700">
-          {formatCurrency(demographics.monthly_income)}
+          {formatCurrency(demographics?.monthly_income)}
         </div>
         <div className="col-span-3">
           <div className="flex items-center space-x-2">
             <span
               className={`px-3 py-1 text-xs font-medium rounded-full ${badgeColor(
-                risk_assessment.overall_risk
+                risk_assessment?.overall_risk
               )}`}
             >
-              {risk_assessment.overall_risk}
+              {risk_assessment?.overall_risk}
             </span>
             <span
               className={`text-xs font-semibold ${getRiskColor(
-                risk_assessment.default_probability
+                risk_assessment?.default_probability || 1
               )}`}
             >
-              ({formatPercentage(risk_assessment.default_probability)})
+              ({formatPercentage(risk_assessment?.default_probability)})
             </span>
           </div>
         </div>
         <div className="col-span-2 flex justify-between items-center">
           <span
             className={`px-3 py-1 text-xs font-medium rounded-full ${badgeColor(
-              risk_assessment.recommendation
+              risk_assessment?.recommendation
             )}`}
           >
-            {risk_assessment.recommendation}
+            {risk_assessment?.recommendation}
           </span>
           <button className="text-gray-400 hover:text-gray-600 transition-colors p-1">
             <i
@@ -117,7 +132,7 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Age
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {safeDisplayValue(demographics.age)} years
+                    {safeDisplayValue(demographics?.age)} years
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -125,7 +140,7 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Gender
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {safeDisplayValue(demographics.gender)}
+                    {safeDisplayValue(demographics?.gender)}
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -133,7 +148,7 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Education
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {safeDisplayValue(demographics.education)}
+                    {safeDisplayValue(demographics?.education)}
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -141,7 +156,7 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Employment
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {safeDisplayValue(demographics.employment)}
+                    {safeDisplayValue(demographics?.employment)}
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -149,7 +164,7 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Monthly Income
                   </div>
                   <div className="text-lg font-semibold text-green-600">
-                    {formatCurrency(demographics.monthly_income)}
+                    {formatCurrency(demographics?.monthly_income)}
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -157,7 +172,7 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Location
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {safeDisplayValue(demographics.location)}
+                    {safeDisplayValue(demographics?.location)}
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -165,7 +180,15 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     Marital Status
                   </div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {safeDisplayValue(demographics.marital_status)}
+                    {safeDisplayValue(demographics?.marital_status)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Dependents
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {safeDisplayValue(demographics?.dependents)}
                   </div>
                 </div>
               </div>
@@ -187,19 +210,19 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                     </div>
                     <span
                       className={`px-3 py-1 text-sm font-medium rounded-full ${badgeColor(
-                        risk_assessment.overall_risk
+                        risk_assessment?.overall_risk
                       )}`}
                     >
-                      {risk_assessment.overall_risk}
+                      {risk_assessment?.overall_risk}
                     </span>
                   </div>
                   <div className="text-right">
                     <div
                       className={`text-3xl font-bold mb-1 ${getRiskColor(
-                        risk_assessment.default_probability
+                        risk_assessment?.default_probability || 1
                       )}`}
                     >
-                      {formatPercentage(risk_assessment.default_probability)}
+                      {formatPercentage(risk_assessment?.default_probability)}
                     </div>
                     <div className="text-sm text-gray-500">Default Probability</div>
                   </div>
@@ -211,11 +234,95 @@ function ApplicantCard({ applicant, isExpanded, onToggle }) {
                   <div className="flex items-center justify-center">
                     <span
                       className={`px-6 py-3 text-lg font-semibold rounded-lg ${badgeColor(
-                        risk_assessment.recommendation
+                        risk_assessment?.recommendation
                       )}`}
                     >
-                      {risk_assessment.recommendation}
+                      {risk_assessment?.recommendation}
                     </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Loan Details */}
+            <div>
+              <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                <div className="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-full mr-4">
+                  <i className="fas fa-file-invoice-dollar text-amber-600 text-lg"></i>
+                </div>
+                Loan Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Loan Applied
+                  </div>
+                  <div className="text-lg font-semibold text-blue-600">
+                    {formatCurrency(loan_details?.loan_applied)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Loan Type
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {safeDisplayValue(loan_details?.loan_type)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Interest Rate
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {safeDisplayValue(loan_details?.interest_rate)}%
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Application Date
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {safeDisplayValue(loan_details?.application_date)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Outstanding Amount
+                  </div>
+                  <div className="text-lg font-semibold text-red-600">
+                    {formatCurrency(loan_details?.outstanding_amount)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Property Value
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {formatCurrency(loan_details?.property_value)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    DSCR
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {formatNumber(loan_details?.dscr)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Income/Expense Ratio
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {formatNumber(loan_details?.income_expense_ratio)}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    Utilization Ratio
+                  </div>
+                  <div className="text-lg font-semibold text-gray-900">
+                    {formatPercentage(loan_details?.utilization_ratio)}
                   </div>
                 </div>
               </div>
