@@ -130,13 +130,11 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
   return (
     <>
       <div className="space-y-6">
+        {/* Header - Removed the "X analyses stored" text */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
             {userType === "user" ? "My Analysis History" : "Analysis History"}
           </h1>
-          <div className="text-sm text-gray-500">
-            {Array.isArray(history) ? history.length : 0} analyses stored
-          </div>
         </div>
 
         {!Array.isArray(history) || history.length === 0 ? (
@@ -384,7 +382,7 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
                                 title="View details"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
                                 <span>View</span>
@@ -412,37 +410,9 @@ function AnalysisHistory({ history, onLoadAnalysis, showNotification, onDeleteAn
           </div>
         )}
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <span className="text-blue-400">ℹ️</span>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">
-                {userType === "user" ? "Personal Analysis Summary" : "Analysis Summary"}
-              </h3>
-              <div className="mt-2 text-sm text-blue-700">
-                {userType === "user" ? (
-                  <>
-                    <p>• Click on any row to view your detailed credit analysis report</p>
-                    <p>• Risk categories: Low Risk (Good), Medium Risk (Review), High Risk (Needs Improvement)</p>
-                    <p>• Your risk score and monthly income help determine your creditworthiness</p>
-                    <p>• Higher income and lower risk scores generally indicate better loan terms</p>
-                  </>
-                ) : (
-                  <>
-                    <p>• Click on any row to view detailed analysis results</p>
-                    <p>• Risk categories: Low Risk (Green), Medium Risk (Yellow), High Risk (Red - combines High & Very High)</p>
-                    <p>• Average risk score and default probability shown for quick comparison</p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Removed the blue information box that was at the bottom */}
       </div>
 
-    
       {selectedAnalysis && (
         <ResultsModal
           isOpen={modalOpen}

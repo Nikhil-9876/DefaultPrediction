@@ -4,32 +4,32 @@ function CreditRiskForm({ onProcess, isLoading }) {
   // City to location type mapping based on your image
   const cityLocationMapping = {
     // Metro cities
-    "Ahmedabad": "Metro",
-    "Surat": "Metro", 
-    "Vadodara": "Metro",
-    
+    Ahmedabad: "Metro",
+    Surat: "Metro",
+    Vadodara: "Metro",
+
     // Tier1 cities
-    "Rajkot": "Tier1",
-    "Bhavnagar": "Tier1",
-    "Jamnagar": "Tier1",
-    "Gandhinagar": "Metro", // Updated to Metro as shown in image
-    "Surendranagar": "Tier1",
-    
+    Rajkot: "Tier1",
+    Bhavnagar: "Tier1",
+    Jamnagar: "Tier1",
+    Gandhinagar: "Metro", // Updated to Metro as shown in image
+    Surendranagar: "Tier1",
+
     // Tier2 cities
-    "Junagadh": "Tier2",
-    "Nadiad": "Tier2",
-    "Morbi": "Tier2",
-    "Anand": "Tier2",
-    "Mehsana": "Tier2",
-    "Navsari": "Tier2",
-    "Bharuch": "Tier2",
-    "Vapi": "Tier2",
-    "Valsad": "Tier2",
-    "Patan": "Tier2",
-    "Godhra": "Tier2",
-    "Porbandar": "Tier2",
-    "Palanpur": "Tier2",
-    "Veraval": "Tier2"
+    Junagadh: "Tier2",
+    Nadiad: "Tier2",
+    Morbi: "Tier2",
+    Anand: "Tier2",
+    Mehsana: "Tier2",
+    Navsari: "Tier2",
+    Bharuch: "Tier2",
+    Vapi: "Tier2",
+    Valsad: "Tier2",
+    Patan: "Tier2",
+    Godhra: "Tier2",
+    Porbandar: "Tier2",
+    Palanpur: "Tier2",
+    Veraval: "Tier2",
   };
 
   const [formData, setFormData] = useState({
@@ -291,7 +291,7 @@ function CreditRiskForm({ onProcess, isLoading }) {
           ...formData,
           applicant_id: formData.applicant_id || generateApplicantId(),
           // Ensure location_type is set based on selected city
-          location_type: cityLocationMapping[formData.city] || "Tier2"
+          location_type: cityLocationMapping[formData.city] || "Tier2",
         };
 
         const csvData = convertToCSV(finalData);
@@ -323,7 +323,7 @@ function CreditRiskForm({ onProcess, isLoading }) {
       generateApplicantId,
       convertToCSV,
       onProcess,
-      cityLocationMapping
+      cityLocationMapping,
     ]
   );
 
@@ -566,7 +566,7 @@ function CreditRiskForm({ onProcess, isLoading }) {
 
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            City * 
+            City *
             {formData.city && (
               <span className="ml-2 text-sm text-blue-600">
                 (Location Type: {cityLocationMapping[formData.city] || "Tier2"})
@@ -1221,19 +1221,6 @@ function CreditRiskForm({ onProcess, isLoading }) {
           )}
         </div>
       </form>
-
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h4 className="font-semibold text-yellow-800 mb-2 flex items-center">
-          <i className="fas fa-question-circle mr-2"></i>
-          Need Help?
-        </h4>
-        <p className="text-sm text-yellow-700">
-          This form collects personal information for credit risk assessment.
-          All financial amounts should be in Indian Rupees (INR). Fields marked
-          with * are required. Location type is automatically determined based on your selected city.
-          Data will be processed securely and used only for credit evaluation.
-        </p>
-      </div>
     </div>
   );
 }

@@ -68,7 +68,7 @@ function ResultsDisplay({ data, filename, showNotification }) {
         monthly_income: applicant.monthly_income_inr,
         location: applicant.city || applicant.location_type || "N/A",
         marital_status: applicant.marital_status || "N/A",
-        dependents: applicant.number_of_dependents || "N/A"
+        dependents: applicant.number_of_dependents,
       },
       risk_assessment: {
         overall_risk: applicant.risk_category,
